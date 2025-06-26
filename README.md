@@ -1,4 +1,4 @@
-# Flightradar24 Python SDK (fr24sdk)
+# Flightradar24 Python SDK (fr24api-sdk-python)
 
 Python SDK for the [Flightradar24 API](https://fr24api.flightradar24.com).
 
@@ -23,15 +23,6 @@ pip install fr24sdk
 **Using uv:**
 ```bash
 uv pip install fr24sdk
-```
-
-### Development Version (Recommended for Contributors)
-
-If you want to contribute to the SDK or use the latest unreleased changes:
-
-```bash
-git clone https://github.com/flightradar24/fr24api-sdk.git
-cd fr24api-sdk
 ```
 
 **Setting up the environment with pip:**
