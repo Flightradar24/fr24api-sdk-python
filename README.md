@@ -205,7 +205,7 @@ client.close()
 
 ## Contributing
 
-Contributions are welcome! Please see `CONTRIBUTING.md` (to be created) for guidelines.
+Contributions are welcome! Please see `CONTRIBUTING.md` for guidelines.
 
 ## License
 
