@@ -40,7 +40,7 @@ def request_url_in_exc_message(exc: Fr24SdkError, expected_url: str) -> bool:
         and exc.request is not None
         and hasattr(exc.request, "url")
     ):
-        if str(exc.request.url) == expected_url:  # type: ignore[attr-defined]
+        if str(exc.request.url) == expected_url:
             return True
     # Fallback: Check the string representation of the exception
     return expected_url in str(exc)
@@ -107,18 +107,18 @@ def test_transport_uses_provided_httpx_client():
     assert mock_client.is_closed
 
 
-def test_api_token_from_env(transport_with_env_token: HttpTransport):
+def test_api_token_from_env(transport_with_env_token: HttpTransport) -> None:
     assert transport_with_env_token.api_token == TEST_TOKEN
 
 
-def test_api_token_direct_takes_precedence(monkeypatch: pytest.MonkeyPatch):
+def test_api_token_direct_takes_precedence(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("FR24_API_TOKEN", "env_token")
     trans = HttpTransport(api_token="direct_token")
     assert trans.api_token == "direct_token"
     trans.close()
 
 
-def test_default_headers(transport: HttpTransport):
+def test_default_headers(transport: HttpTransport) -> None:
     headers = transport._get_default_headers()
     assert headers["Accept"] == "application/json"
     assert headers["Accept-Version"] == DEFAULT_API_VERSION
@@ -127,7 +127,7 @@ def test_default_headers(transport: HttpTransport):
 
 @respx_mock  # Use the respx.mock decorator
 @pytest.mark.parametrize("method", ["GET", "POST", "PUT", "DELETE"])
-def test_successful_request(method: str):  # Removed respx_router fixture from args
+def test_successful_request(method: str) -> None:
     expected_response_json = {"success": True, "data": "test_data"}
     # Use respx.method directly instead of respx_router.method
     route = getattr(respx_mock, method.lower())(FULL_TEST_URL).respond(
@@ -148,8 +148,8 @@ def test_successful_request(method: str):  # Removed respx_router fixture from a
 
 
 @respx_mock  # Use the respx.mock decorator
-def test_request_with_params_and_custom_headers():  # Removed respx_router fixture
-    params = {"key1": "value1", "key2": 123}
+def test_request_with_params_and_custom_headers() -> None:  # Removed respx_router fixture
+    params: dict[str, str | int] = {"key1": "value1", "key2": 123}
     custom_headers = {"X-Custom-Header": "custom_value"}
     # Use respx.method directly
     route = respx_mock.get(FULL_TEST_URL, params=params).respond(
@@ -202,7 +202,7 @@ def test_api_error_mapping(
     error_json: dict[str, Any],
     expected_exception: Type[ApiError],
     error_message: str,
-):
+) -> None:
     route = respx_mock.get(FULL_TEST_URL).respond(
         status_code=status_code, json=error_json
     )
@@ -225,7 +225,7 @@ def test_api_error_mapping(
 
 
 @respx_mock  # Use the respx.mock decorator
-def test_api_error_mapping_non_json_response():
+def test_api_error_mapping_non_json_response() -> None:
     error_text = "An unexpected HTML error page"
     route = respx_mock.get(FULL_TEST_URL).respond(status_code=500, text=error_text)
 
@@ -274,7 +274,7 @@ def test_transport_level_errors(
     exception_to_raise: httpx.RequestError,
     expected_sdk_exception: Type[TransportError],
     error_message_contains: str,
-):
+) -> None:
     route = respx_mock.get(FULL_TEST_URL).mock(side_effect=exception_to_raise)
 
     client_for_test = httpx.Client(base_url=DEFAULT_BASE_URL)
@@ -293,7 +293,7 @@ def test_transport_level_errors(
 
 
 @respx_mock  # Use the respx.mock decorator
-def test_transport_context_manager():  # respx_router fixture removed
+def test_transport_context_manager() -> None:  # respx_router fixture removed
     route = respx_mock.get(FULL_TEST_URL).respond(200)  # Use respx_mock
 
     raw_client_passed_to_transport = httpx.Client(base_url=DEFAULT_BASE_URL)
@@ -310,7 +310,7 @@ def test_transport_context_manager():  # respx_router fixture removed
 
 
 @respx_mock  # Use the respx.mock decorator
-def test_transport_explicit_close():  # respx_router fixture removed
+def test_transport_explicit_close() -> None:  # respx_router fixture removed
     route = respx_mock.get(FULL_TEST_URL).respond(200)  # Use respx_mock
 
     raw_client_passed_to_transport = httpx.Client(base_url=DEFAULT_BASE_URL)

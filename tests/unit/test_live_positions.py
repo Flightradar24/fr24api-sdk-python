@@ -204,13 +204,13 @@ class TestLivePositionsResource:
         mock_transport.request.return_value = mock_response
 
         # Call with airspaces parameter
-        live_positions.get_light(airspaces="FIR:EGTT")
+        live_positions.get_light(airspaces=["EGTT"])
 
         # Verify parameter was correctly passed
         args, kwargs = mock_transport.request.call_args
         params = kwargs["params"]
         assert "airspaces" in params
-        assert params["airspaces"] == "FIR:EGTT"
+        assert params["airspaces"] == "EGTT"
 
     def test_with_all_parameters(self, live_positions, mock_transport):
         """Test a call with all possible parameters."""
@@ -234,7 +234,7 @@ class TestLivePositionsResource:
             squawks=["1234"],
             categories=["P"],
             data_sources=["ADSB"],
-            airspaces="FIR:EGTT",
+            airspaces=["EGTT"],
             gspeed=500,
             limit=100,
         )

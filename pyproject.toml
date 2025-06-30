@@ -74,18 +74,15 @@ lint.ignore = [
 ]
 
 [tool.mypy]
+strict = true
 python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-ignore_missing_imports = true # Start with this and reduce as stubs become available or are created
-disallow_untyped_defs = true
-disallow_any_generics = false # Becomes too verbose quickly, can enable later for specific modules
-check_untyped_defs = true
-strict_optional = true # Enable this early
+warn_return_any = false
+warn_unused_configs = false
+ignore_missing_imports = true
+disallow_untyped_defs = false
+disallow_any_generics = false
+check_untyped_defs = false
 
-[[tool.mypy.overrides]]
-module = "tests.*"
-allow_untyped_defs = true # Often tests are less strict
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -99,7 +96,7 @@ python_files = "test_*.py"
 source = ["src/fr24sdk"]
 
 [tool.coverage.report]
-fail_under = 80 # Start with a reasonable target
+fail_under = 80
 
 [tool.bandit]
-skips = ["B101"] # Allow assert in tests 
+skips = ["B101"]

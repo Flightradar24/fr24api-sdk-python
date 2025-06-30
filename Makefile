@@ -7,3 +7,6 @@ format:
 
 test:
 	uv run pytest
+
+typecheck:
+	uv run mypy .

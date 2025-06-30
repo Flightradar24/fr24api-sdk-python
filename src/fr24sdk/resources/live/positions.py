@@ -72,12 +72,12 @@ class _LivePositionsParams(BaseModel):
     data_sources: Optional[
         list[Annotated[str, StringConstraints(pattern=DATA_SOURCE_PATTERN)]]
     ] = Field(default=None, max_length=15)
-    airspaces: Optional[str] = None
+    airspaces: Optional[list[str]] = Field(default=None, max_length=15)
     gspeed: Optional[Annotated[int, Field(ge=0, le=5000)]] = None
     limit: Optional[Annotated[int, Field(ge=0, le=30000)]] = None
 
     @model_serializer(mode="plain")
-    def _to_query_dict(self):
+    def _to_query_dict(self) -> dict[str, Any]:
         """Convert model to query dictionary, excluding None values."""
         query: dict[str, Any] = {}
         for key, value in self.__dict__.items():

@@ -83,7 +83,7 @@ class _HistoricPositionsParams(BaseModel):
 
     @field_validator("timestamp")
     @classmethod
-    def validate_timestamp(cls, v):
+    def validate_timestamp(cls, v: Union[int, datetime]) -> int:
         if isinstance(v, datetime):
             # If datetime has no timezone info, treat it as UTC
             if v.tzinfo is None:
@@ -101,7 +101,7 @@ class _HistoricPositionsParams(BaseModel):
         return timestamp_value
 
     @model_serializer(mode="plain")
-    def _to_query_dict(self):
+    def _to_query_dict(self) -> dict[str, Any]:
         """Convert model to query dictionary, excluding None values."""
         query: dict[str, Any] = {}
         for key, value in self.__dict__.items():

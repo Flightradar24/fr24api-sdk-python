@@ -56,7 +56,7 @@ class _FlightSummaryParams(BaseModel):
     limit: Optional[Annotated[int, Field(ge=0, le=20000)]] = None
 
     @model_serializer(mode="plain")
-    def _to_query_dict(self):
+    def _to_query_dict(self) -> dict[str, Any]:
         query: dict[str, Any] = {}
         for key, value in self.__dict__.items():
             if value is None:

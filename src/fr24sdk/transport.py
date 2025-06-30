@@ -87,7 +87,7 @@ class HttpTransport:
             response = self._client.request(
                 method=method,
                 url=path,
-                params=params,  # type: ignore[arg-type]
+                params=params,
                 json=json_data,
                 headers=request_headers,
             )
@@ -129,9 +129,12 @@ class HttpTransport:
 
         try:
             body_content: Union[dict[str, Any], str] = response.json()
-            error_message_detail = body_content.get(
-                "details", body_content.get("message", response.text)
-            )
+            if isinstance(body_content, dict):
+                error_message_detail = body_content.get(
+                    "details", body_content.get("message", response.text)
+                )
+            else:
+                error_message_detail = str(body_content)
         except ValueError:  # Not JSON
             body_content = response.text
             error_message_detail = response.text
