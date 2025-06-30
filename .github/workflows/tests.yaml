@@ -45,4 +45,4 @@ jobs:
         with:
           enable-cache: true
       - name: Install dependencies
-        run: make sync
+        run: uv sync
