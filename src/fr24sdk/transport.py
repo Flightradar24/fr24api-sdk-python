@@ -65,7 +65,9 @@ class HttpTransport:
         self,
         method: str,
         path: str,
-        params: Optional[Mapping[str, Union[str, int, float, Sequence[Union[str, int, float]]]]] = None,
+        params: Optional[
+            Mapping[str, Union[str, int, float, Sequence[Union[str, int, float]]]]
+        ] = None,
         json_data: Optional[Any] = None,
         headers: Optional[Mapping[str, str]] = None,
     ) -> httpx.Response:
@@ -85,7 +87,7 @@ class HttpTransport:
             response = self._client.request(
                 method=method,
                 url=path,
-                params=params,  # type: ignore[arg-type]
+                params=params,
                 json=json_data,
                 headers=request_headers,
             )
@@ -97,21 +99,27 @@ class HttpTransport:
                 try:
                     debug_body = response.json()
                 except ValueError:
-                    debug_body = response.text[:500] + ("... (truncated)" if len(response.text) > 500 else "")
+                    debug_body = response.text[:500] + (
+                        "... (truncated)" if len(response.text) > 500 else ""
+                    )
                 logger.debug(f"Response body: {debug_body}")
-            
+
             response.raise_for_status()
             return response
 
         except httpx.HTTPStatusError as e:
             self._handle_http_status_error(e)
-            raise # Should be unreachable due to _handle_http_status_error always raising
-        except httpx.TimeoutException as e: # Catch specific httpx errors
+            raise  # Should be unreachable due to _handle_http_status_error always raising
+        except httpx.TimeoutException as e:  # Catch specific httpx errors
             logger.error(f"Request timed out: {method} {log_url}")
-            raise TransportError(f"Request timed out: {method} {log_url}", request=e.request) from e
-        except httpx.RequestError as e: 
+            raise TransportError(
+                f"Request timed out: {method} {log_url}", request=e.request
+            ) from e
+        except httpx.RequestError as e:
             logger.error(f"Request failed: {method} {log_url} - {e}")
-            raise TransportError(f"Request failed: {method} {log_url} - {e}", request=e.request) from e
+            raise TransportError(
+                f"Request failed: {method} {log_url} - {e}", request=e.request
+            ) from e
 
     def _handle_http_status_error(self, exc: httpx.HTTPStatusError) -> None:
         """Maps HTTPStatusError to a more specific ApiError subclass and raises it."""
@@ -121,7 +129,12 @@ class HttpTransport:
 
         try:
             body_content: Union[dict[str, Any], str] = response.json()
-            error_message_detail = body_content.get("details", body_content.get("message", response.text))
+            if isinstance(body_content, dict):
+                error_message_detail = body_content.get(
+                    "details", body_content.get("message", response.text)
+                )
+            else:
+                error_message_detail = str(body_content)
         except ValueError:  # Not JSON
             body_content = response.text
             error_message_detail = response.text
@@ -136,7 +149,7 @@ class HttpTransport:
             logger.error(
                 f"API Error {status_code} for {request.method} {full_request_url}: {error_message}"
             )
-        
+
         logger.debug(f"API Error response body: {response.text}")
 
         specific_error_map: dict[int, Type[ApiError]] = {
@@ -148,12 +161,13 @@ class HttpTransport:
         }
 
         error_class = specific_error_map.get(status_code, ApiError)
-        raise error_class(error_message, request=request, response=response, body=body_content) from exc
-
+        raise error_class(
+            error_message, request=request, response=response, body=body_content
+        ) from exc
 
     def close(self) -> None:
         """Closes the underlying HTTP client."""
-        if hasattr(self, '_client') and self._client and not self._client.is_closed:
+        if hasattr(self, "_client") and self._client and not self._client.is_closed:
             self._client.close()
 
     def __enter__(self) -> "HttpTransport":

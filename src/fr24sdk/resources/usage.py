@@ -6,6 +6,7 @@
 from ..transport import HttpTransport
 from ..models.usage import UsageLogSummaryResponse
 
+
 class UsageResource:
     """Provides access to API usage data."""
 
@@ -18,12 +19,14 @@ class UsageResource:
         """Get info on API account usage.
 
         Args:
-            period: Time period for usage summary. 
+            period: Time period for usage summary.
                     Enum: "24h", "7d", "30d", "1y". Default: "24h".
 
         Returns:
             A UsageLogSummaryResponse object.
         """
-        response = self._transport.request("GET", self.BASE_PATH, params={"period": period})
+        response = self._transport.request(
+            "GET", self.BASE_PATH, params={"period": period}
+        )
         print(response.json())
-        return UsageLogSummaryResponse(**response.json()) 
+        return UsageLogSummaryResponse(**response.json())

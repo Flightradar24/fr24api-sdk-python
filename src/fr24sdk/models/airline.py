@@ -9,6 +9,7 @@ from typing import Optional
 
 class AirlineLight(BaseModel):
     """Basic airline information."""
+
     name: str
     icao: str
     iata: Optional[str] = None

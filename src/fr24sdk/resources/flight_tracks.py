@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: MIT
 """Resource class for flight track data."""
 
-
 from ..transport import HttpTransport
 from ..models.flight import FlightTracksResponse
+
 
 class FlightTracksResource:
     """Provides access to flight track data."""
@@ -24,5 +24,7 @@ class FlightTracksResource:
         Returns:
             A FlightTracksResponse object containing the flight tracks.
         """
-        response = self._transport.request("GET", self.BASE_PATH, params={"flight_id": flight_id})
+        response = self._transport.request(
+            "GET", self.BASE_PATH, params={"flight_id": flight_id}
+        )
         return FlightTracksResponse(data=response.json())

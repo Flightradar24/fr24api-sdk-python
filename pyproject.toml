@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "fr24sdk"
-version = "0.1.0"
+version = "0.0.1"
 description = "Python SDK for the Flightradar24 API"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -27,9 +27,10 @@ classifiers = [
 ]
 
 dependencies = [
-  "httpx>=0.26,<0.28", # Pinned to a minor version for stability, allowing patch updates.
+  "httpx>=0.26,<0.28",
   "exceptiongroup; python_version < '3.11'",
-  "tenacity>=8.2,<9.0" # Added tenacity for retry logic
+  "tenacity>=8.2,<9.0",
+  "pydantic>=2.10.6,<2.11.0"
 ]
 
 [project.urls]
@@ -38,9 +39,9 @@ Documentation = "https://github.com/flightradar24/fr24api-sdk/blob/main/docs/REA
 Repository = "https://github.com/flightradar24/fr24api-sdk"
 Changelog = "https://github.com/flightradar24/fr24api-sdk/blob/main/CHANGELOG.md"
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
-  "ruff",
+  "ruff==0.12.1",
   "mypy",
   "pytest",
   "pytest-cov",
@@ -61,40 +62,27 @@ dev = [
 path = "src/fr24sdk/__init__.py"
 
 [tool.ruff]
-line-length = 88
-select = ["ALL"]
-ignore = [
-    "S101",  # Allow assert
-    "ANN101", # Allow missing type annotation for `self` in method
-    "ANN102", # Allow missing type annotation for `cls` in classmethod
-    "D203",   # 1 blank line required before class docstring (conflict with black/blue)
-    "D213",   # Multi-line docstring summary should start at the second line (conflict with black/blue)
-    "FIX002", # Line contains TODO
-    "TD002",  # Missing author in TODO
-    "TD003",  # Missing issue link or ticket in TODO
-    "COM812", # Conflict with ruff formatter
+lint.ignore = [
+    "S101",
+    "D203",
+    "D213",
+    "FIX002",
+    "TD002",
+    "TD003",
+    "COM812",
+    "E501",
 ]
 
-
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-skip-magic-trailing-comma = false
-line-ending = "auto"
-
 [tool.mypy]
-python_version = "3.9"
-warn_return_any = true
-warn_unused_configs = true
-ignore_missing_imports = true # Start with this and reduce as stubs become available or are created
-disallow_untyped_defs = true
-disallow_any_generics = false # Becomes too verbose quickly, can enable later for specific modules
-check_untyped_defs = true
-strict_optional = true # Enable this early
+strict = true
+python_version = "3.11"
+warn_return_any = false
+warn_unused_configs = false
+ignore_missing_imports = true
+disallow_untyped_defs = false
+disallow_any_generics = false
+check_untyped_defs = false
 
-[[tool.mypy.overrides]]
-module = "tests.*"
-allow_untyped_defs = true # Often tests are less strict
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -108,7 +96,7 @@ python_files = "test_*.py"
 source = ["src/fr24sdk"]
 
 [tool.coverage.report]
-fail_under = 80 # Start with a reasonable target
+fail_under = 80
 
 [tool.bandit]
-skips = ["B101"] # Allow assert in tests 
+skips = ["B101"]

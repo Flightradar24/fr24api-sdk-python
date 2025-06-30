@@ -8,6 +8,7 @@ from typing import Optional
 from ..transport import HttpTransport
 from ..models.airline import AirlineLight
 
+
 class AirlinesResource:
     """Provides access to airline data."""
 

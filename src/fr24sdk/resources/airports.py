@@ -8,6 +8,7 @@ from typing import Optional
 from ..transport import HttpTransport
 from ..models.airport import AirportLight, AirportFull
 
+
 class AirportsResource:
     """Provides access to airport data."""
 
