@@ -4,13 +4,18 @@
 """Resource class for live flight position data."""
 
 from typing import Optional, Any, Annotated, Union
-from pydantic import BaseModel, StringConstraints, Field, field_serializer, model_serializer
+from pydantic import (
+    BaseModel,
+    StringConstraints,
+    Field,
+    model_serializer,
+)
 
 from ...transport import HttpTransport
 from ...models.flight import (
     FlightPositionsLightResponse,
     FlightPositionsFullResponse,
-    CountResponse
+    CountResponse,
 )
 from ...models.geographic import (
     Boundary,
@@ -28,21 +33,45 @@ from ...models.regex_patterns import (
     DATA_SOURCE_PATTERN,
 )
 
+
 class _LivePositionsParams(BaseModel):
     """Validate & serialise live-positions query parameters."""
+
     bounds: Optional[Union[Boundary, str]] = None
-    flights: Optional[list[Annotated[str, StringConstraints(pattern=FLIGHT_NUMBER_PATTERN)]]] = Field(default=None, max_length=15)
-    callsigns: Optional[list[Annotated[str, StringConstraints(pattern=CALLSIGN_PATTERN)]]] = Field(default=None, max_length=15)
-    registrations: Optional[list[Annotated[str, StringConstraints(pattern=REGISTRATION_PATTERN)]]] = Field(default=None, max_length=15)
-    painted_as: Optional[list[Annotated[str, StringConstraints(pattern=AIRLINE_ICAO_PATTERN)]]] = Field(default=None, max_length=15)
-    operating_as: Optional[list[Annotated[str, StringConstraints(pattern=AIRLINE_ICAO_PATTERN)]]] = Field(default=None, max_length=15)
-    airports: Optional[list[Annotated[str, StringConstraints(pattern=AIRPORT_PARAM_PATTERN)]]] = Field(default=None, max_length=15)
-    routes: Optional[list[Annotated[str, StringConstraints(pattern=ROUTE_PATTERN)]]] = Field(default=None, max_length=15)
+    flights: Optional[
+        list[Annotated[str, StringConstraints(pattern=FLIGHT_NUMBER_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    callsigns: Optional[
+        list[Annotated[str, StringConstraints(pattern=CALLSIGN_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    registrations: Optional[
+        list[Annotated[str, StringConstraints(pattern=REGISTRATION_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    painted_as: Optional[
+        list[Annotated[str, StringConstraints(pattern=AIRLINE_ICAO_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    operating_as: Optional[
+        list[Annotated[str, StringConstraints(pattern=AIRLINE_ICAO_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    airports: Optional[
+        list[Annotated[str, StringConstraints(pattern=AIRPORT_PARAM_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    routes: Optional[list[Annotated[str, StringConstraints(pattern=ROUTE_PATTERN)]]] = (
+        Field(default=None, max_length=15)
+    )
     aircraft: Optional[str] = None
-    altitude_ranges: Annotated[Optional[list[Union[AltitudeRange, str]]], Field(default=None, max_length=15)] = None
-    squawks: Optional[list[Annotated[str, StringConstraints(pattern=SQUAWK_PATTERN)]]] = Field(default=None, max_length=15)
-    categories: Optional[list[Annotated[str, StringConstraints(pattern=SERVICE_TYPES_PATTERN)]]] = Field(default=None, max_length=15)
-    data_sources: Optional[list[Annotated[str, StringConstraints(pattern=DATA_SOURCE_PATTERN)]]] = Field(default=None, max_length=15)
+    altitude_ranges: Annotated[
+        Optional[list[Union[AltitudeRange, str]]], Field(default=None, max_length=15)
+    ] = None
+    squawks: Optional[
+        list[Annotated[str, StringConstraints(pattern=SQUAWK_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    categories: Optional[
+        list[Annotated[str, StringConstraints(pattern=SERVICE_TYPES_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    data_sources: Optional[
+        list[Annotated[str, StringConstraints(pattern=DATA_SOURCE_PATTERN)]]
+    ] = Field(default=None, max_length=15)
     airspaces: Optional[str] = None
     gspeed: Optional[Annotated[int, Field(ge=0, le=5000)]] = None
     limit: Optional[Annotated[int, Field(ge=0, le=30000)]] = None
@@ -61,7 +90,6 @@ class _LivePositionsParams(BaseModel):
         return query
 
 
-
 class LivePositionsResource:
     """Provides access to live flight position data."""
 
@@ -69,7 +97,7 @@ class LivePositionsResource:
 
     def __init__(self, transport: HttpTransport):
         self._transport = transport
-    
+
     def get_light(
         self,
         bounds: Optional[Union[Boundary, str]] = None,
@@ -89,7 +117,7 @@ class LivePositionsResource:
         gspeed: Optional[int] = None,
         limit: Optional[int] = None,
     ) -> FlightPositionsLightResponse:
-        """Returns real-time information on aircraft flight movements including latitude, longitude, speed, and altitude. At least one query parameter is required to retrieve data.        
+        """Returns real-time information on aircraft flight movements including latitude, longitude, speed, and altitude. At least one query parameter is required to retrieve data.
         Requires at least one filter parameter (e.g., bounds, flights).
         """
         params = _LivePositionsParams(
@@ -108,9 +136,11 @@ class LivePositionsResource:
             data_sources=data_sources,
             airspaces=airspaces,
             gspeed=gspeed,
-            limit=limit
+            limit=limit,
         ).model_dump(exclude_none=True)
-        response = self._transport.request("GET", f"{self.BASE_PATH}/light", params=params)
+        response = self._transport.request(
+            "GET", f"{self.BASE_PATH}/light", params=params
+        )
         if response.json():
             return FlightPositionsLightResponse(**response.json())
         else:
@@ -154,9 +184,11 @@ class LivePositionsResource:
             data_sources=data_sources,
             airspaces=airspaces,
             gspeed=gspeed,
-            limit=limit
+            limit=limit,
         ).model_dump(exclude_none=True)
-        response = self._transport.request("GET", f"{self.BASE_PATH}/full", params=params)
+        response = self._transport.request(
+            "GET", f"{self.BASE_PATH}/full", params=params
+        )
         if response.json():
             return FlightPositionsFullResponse(**response.json())
         else:
@@ -180,7 +212,7 @@ class LivePositionsResource:
         gspeed: Optional[int] = None,
     ) -> CountResponse:
         """Get count of live flight positions.
-        
+
         Requires at least one filter parameter (e.g., bounds, flights).
         The 'airspaces' parameter is not applicable to the count endpoint.
         """
@@ -198,7 +230,9 @@ class LivePositionsResource:
             squawks=squawks,
             categories=categories,
             data_sources=data_sources,
-            gspeed=gspeed
+            gspeed=gspeed,
         ).model_dump(exclude_none=True)
-        response = self._transport.request("GET", f"{self.BASE_PATH}/count", params=params)
+        response = self._transport.request(
+            "GET", f"{self.BASE_PATH}/count", params=params
+        )
         return CountResponse(**response.json())

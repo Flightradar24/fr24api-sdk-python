@@ -6,6 +6,7 @@
 __version__ = "0.1.0"
 
 from .client import Client
+
 # from .async_client import AsyncClient # To be added later
 from .exceptions import (
     Fr24SdkError,
@@ -30,4 +31,4 @@ __all__ = [
     "BadRequestError",
     "NotFoundError",
     "__version__",
-] 
+]

@@ -30,13 +30,27 @@ class _FlightSummaryParams(BaseModel):
     flight_ids: Optional[list[str]] = Field(default=None, max_length=15)
     flight_datetime_from: Optional[datetime] = None
     flight_datetime_to: Optional[datetime] = None
-    flights: Optional[list[Annotated[str, StringConstraints(pattern=FLIGHT_NUMBER_PATTERN)]]] = Field(default=None, max_length=15)
-    callsigns: Optional[list[Annotated[str, StringConstraints(pattern=CALLSIGN_PATTERN)]]] = Field(default=None, max_length=15)
-    registrations: Optional[list[Annotated[str, StringConstraints(pattern=REGISTRATION_PATTERN)]]] = Field(default=None, max_length=15)
-    painted_as: Optional[list[Annotated[str, StringConstraints(pattern=AIRLINE_ICAO_PATTERN)]]] = Field(default=None, max_length=15)
-    operating_as: Optional[list[Annotated[str, StringConstraints(pattern=AIRLINE_ICAO_PATTERN)]]] = Field(default=None, max_length=15)
-    airports: Optional[list[Annotated[str, StringConstraints(pattern=AIRPORT_CODE_PATTERN)]]] = Field(default=None, max_length=15)
-    routes: Optional[list[Annotated[str, StringConstraints(pattern=ROUTE_PATTERN)]]] = Field(default=None, max_length=15)
+    flights: Optional[
+        list[Annotated[str, StringConstraints(pattern=FLIGHT_NUMBER_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    callsigns: Optional[
+        list[Annotated[str, StringConstraints(pattern=CALLSIGN_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    registrations: Optional[
+        list[Annotated[str, StringConstraints(pattern=REGISTRATION_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    painted_as: Optional[
+        list[Annotated[str, StringConstraints(pattern=AIRLINE_ICAO_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    operating_as: Optional[
+        list[Annotated[str, StringConstraints(pattern=AIRLINE_ICAO_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    airports: Optional[
+        list[Annotated[str, StringConstraints(pattern=AIRPORT_CODE_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    routes: Optional[list[Annotated[str, StringConstraints(pattern=ROUTE_PATTERN)]]] = (
+        Field(default=None, max_length=15)
+    )
     aircraft: Optional[list[str]] = Field(default=None, max_length=15)
     sort: Optional[Annotated[str, StringConstraints(pattern=SORT_PATTERN)]] = None
     limit: Optional[Annotated[int, Field(ge=0, le=20000)]] = None
@@ -106,7 +120,9 @@ class FlightSummaryResource:
             sort=sort,
             limit=limit,
         ).model_dump(exclude_none=True)
-        response = self._transport.request("GET", f"{self.BASE_PATH}/light", params=params)
+        response = self._transport.request(
+            "GET", f"{self.BASE_PATH}/light", params=params
+        )
         return FlightSummaryLightResponse(**response.json())
 
     def get_full(
@@ -145,7 +161,9 @@ class FlightSummaryResource:
             sort=sort,
             limit=limit,
         ).model_dump(exclude_none=True)
-        response = self._transport.request("GET", f"{self.BASE_PATH}/full", params=params)
+        response = self._transport.request(
+            "GET", f"{self.BASE_PATH}/full", params=params
+        )
         return FlightSummaryFullResponse(**response.json())
 
     def count(
@@ -181,5 +199,7 @@ class FlightSummaryResource:
             routes=routes,
             aircraft=aircraft,
         ).model_dump(exclude_none=True)
-        response = self._transport.request("GET", f"{self.BASE_PATH}/count", params=params)
+        response = self._transport.request(
+            "GET", f"{self.BASE_PATH}/count", params=params
+        )
         return CountResponse(**response.json())

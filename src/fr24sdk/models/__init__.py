@@ -47,4 +47,4 @@ __all__ = [
     "AltitudeRange",
     "UsageLogSummary",
     "UsageLogSummaryResponse",
-] 
+]

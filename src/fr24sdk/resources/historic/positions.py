@@ -5,14 +5,19 @@
 
 from typing import Optional, Any, Annotated, Union
 from datetime import datetime, timezone
-from pydantic import (BaseModel, StringConstraints, Field, 
-                      field_serializer, model_serializer, field_validator)
+from pydantic import (
+    BaseModel,
+    StringConstraints,
+    Field,
+    model_serializer,
+    field_validator,
+)
 
 from ...transport import HttpTransport
 from ...models.flight import (
     FlightPositionsLightResponse,
     FlightPositionsFullResponse,
-    CountResponse
+    CountResponse,
 )
 from ...models.geographic import (
     Boundary,
@@ -33,37 +38,66 @@ from ...models.regex_patterns import (
 # Min timestamp: 2016-05-11 00:00:00 UTC
 MIN_HISTORIC_DATETIME = datetime(2016, 5, 11, 0, 0, 0, tzinfo=timezone.utc)
 
+
 class _HistoricPositionsParams(BaseModel):
     """Validate & serialise historic-positions query parameters."""
+
     timestamp: Union[int, datetime]
     bounds: Optional[Union[Boundary, str]] = None
-    flights: Optional[list[Annotated[str, StringConstraints(pattern=FLIGHT_NUMBER_PATTERN)]]] = Field(default=None, max_length=15)
-    callsigns: Optional[list[Annotated[str, StringConstraints(pattern=CALLSIGN_PATTERN)]]] = Field(default=None, max_length=15)
-    registrations: Optional[list[Annotated[str, StringConstraints(pattern=REGISTRATION_PATTERN)]]] = Field(default=None, max_length=15)
-    painted_as: Optional[list[Annotated[str, StringConstraints(pattern=AIRLINE_ICAO_PATTERN)]]] = Field(default=None, max_length=15)
-    operating_as: Optional[list[Annotated[str, StringConstraints(pattern=AIRLINE_ICAO_PATTERN)]]] = Field(default=None, max_length=15)
-    airports: Optional[list[Annotated[str, StringConstraints(pattern=AIRPORT_PARAM_PATTERN)]]] = Field(default=None, max_length=15)
-    routes: Optional[list[Annotated[str, StringConstraints(pattern=ROUTE_PATTERN)]]] = Field(default=None, max_length=15)
+    flights: Optional[
+        list[Annotated[str, StringConstraints(pattern=FLIGHT_NUMBER_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    callsigns: Optional[
+        list[Annotated[str, StringConstraints(pattern=CALLSIGN_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    registrations: Optional[
+        list[Annotated[str, StringConstraints(pattern=REGISTRATION_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    painted_as: Optional[
+        list[Annotated[str, StringConstraints(pattern=AIRLINE_ICAO_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    operating_as: Optional[
+        list[Annotated[str, StringConstraints(pattern=AIRLINE_ICAO_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    airports: Optional[
+        list[Annotated[str, StringConstraints(pattern=AIRPORT_PARAM_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    routes: Optional[list[Annotated[str, StringConstraints(pattern=ROUTE_PATTERN)]]] = (
+        Field(default=None, max_length=15)
+    )
     aircraft: Optional[str] = None
-    altitude_ranges: Annotated[Optional[list[Union[AltitudeRange, str]]], Field(default=None, max_length=15)] = None
-    squawks: Optional[list[Annotated[str, StringConstraints(pattern=SQUAWK_PATTERN)]]] = Field(default=None, max_length=15)
-    categories: Optional[list[Annotated[str, StringConstraints(pattern=SERVICE_TYPES_PATTERN)]]] = Field(default=None, max_length=15)
-    data_sources: Optional[list[Annotated[str, StringConstraints(pattern=DATA_SOURCE_PATTERN)]]] = Field(default=None, max_length=15)
+    altitude_ranges: Annotated[
+        Optional[list[Union[AltitudeRange, str]]], Field(default=None, max_length=15)
+    ] = None
+    squawks: Optional[
+        list[Annotated[str, StringConstraints(pattern=SQUAWK_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    categories: Optional[
+        list[Annotated[str, StringConstraints(pattern=SERVICE_TYPES_PATTERN)]]
+    ] = Field(default=None, max_length=15)
+    data_sources: Optional[
+        list[Annotated[str, StringConstraints(pattern=DATA_SOURCE_PATTERN)]]
+    ] = Field(default=None, max_length=15)
     gspeed: Optional[Annotated[int, Field(ge=0, le=5000)]] = None
     limit: Optional[Annotated[int, Field(ge=0, le=30000)]] = None
 
-    @field_validator('timestamp')
+    @field_validator("timestamp")
     @classmethod
     def validate_timestamp(cls, v):
         if isinstance(v, datetime):
+            # If datetime has no timezone info, treat it as UTC
+            if v.tzinfo is None:
+                v = v.replace(tzinfo=timezone.utc)
             timestamp_value = int(v.timestamp())
         else:
             timestamp_value = v
 
         # Validate the timestamp is after FR24 API Flight Positions History minimum date
         if timestamp_value < int(MIN_HISTORIC_DATETIME.timestamp()):
-            raise ValueError(f"Timestamp must be after {MIN_HISTORIC_DATETIME.isoformat()}")
-            
+            raise ValueError(
+                f"Timestamp must be after {MIN_HISTORIC_DATETIME.isoformat()}"
+            )
+
         return timestamp_value
 
     @model_serializer(mode="plain")
@@ -90,7 +124,7 @@ class HistoricPositionsResource:
 
     def get_light(
         self,
-        timestamp: Union[int, datetime], 
+        timestamp: Union[int, datetime],
         bounds: Optional[Union[Boundary, str]] = None,
         flights: Optional[list[str]] = None,
         callsigns: Optional[list[str]] = None,
@@ -128,14 +162,15 @@ class HistoricPositionsResource:
             categories=categories,
             data_sources=data_sources,
             gspeed=gspeed,
-            limit=limit
+            limit=limit,
         ).model_dump(exclude_none=True)
-        response = self._transport.request("GET", f"{self.BASE_PATH}/light", params=params)
+        response = self._transport.request(
+            "GET", f"{self.BASE_PATH}/light", params=params
+        )
         if response.json():
             return FlightPositionsLightResponse(**response.json())
         else:
             return FlightPositionsLightResponse(data=[])
-        
 
     def get_full(
         self,
@@ -177,14 +212,16 @@ class HistoricPositionsResource:
             categories=categories,
             data_sources=data_sources,
             gspeed=gspeed,
-            limit=limit
+            limit=limit,
         ).model_dump(exclude_none=True)
-        response = self._transport.request("GET", f"{self.BASE_PATH}/full", params=params)
+        response = self._transport.request(
+            "GET", f"{self.BASE_PATH}/full", params=params
+        )
         if response.json():
             return FlightPositionsFullResponse(**response.json())
         else:
             return FlightPositionsFullResponse(data=[])
-    
+
     def count(
         self,
         timestamp: Union[int, datetime],
@@ -204,7 +241,7 @@ class HistoricPositionsResource:
         gspeed: Optional[int] = None,
     ) -> CountResponse:
         """Get count of historical flight positions.
-        
+
         Requires a timestamp and at least one other filter parameter (e.g., bounds, flights).
         The timestamp can be either a datetime object or a UNIX timestamp integer.
         """
@@ -223,8 +260,10 @@ class HistoricPositionsResource:
             squawks=squawks,
             categories=categories,
             data_sources=data_sources,
-            gspeed=gspeed
+            gspeed=gspeed,
         ).model_dump(exclude_none=True)
 
-        response = self._transport.request("GET", f"{self.BASE_PATH}/count", params=params)
+        response = self._transport.request(
+            "GET", f"{self.BASE_PATH}/count", params=params
+        )
         return CountResponse(**response.json())

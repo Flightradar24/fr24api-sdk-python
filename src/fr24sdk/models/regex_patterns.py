@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 """Regular expression patterns for Pydantic field validation."""
 
-# Flightradar24 API 
+# Flightradar24 API
 RADAR_CODE_REGEXP = r"^(?:[A-Z0-9-]{5,10})$"
 
 # Flight Number: e.g., BA2490, U28171, DLH4LF, ACA888T
@@ -23,7 +23,9 @@ CALLSIGN_PATTERN = r"^(?i)(?:[A-Z0-9-]{3,8}|\\*[A-Z0-9-]{3,7}|[A-Z0-9-]{3,7}\\*)
 # - 2 to 12 alphanumeric characters or hyphens.
 # - Can optionally start or end with a '*' but not both, and if so, the alphanumeric/hyphen part is 1 character shorter.
 # - Case-insensitive.
-REGISTRATION_PATTERN = r"^(?i)(?:[A-Z0-9-]{2,12}|\\*[A-Z0-9-]{1,11}|[A-Z0-9-]{1,11}\\*)$"
+REGISTRATION_PATTERN = (
+    r"^(?i)(?:[A-Z0-9-]{2,12}|\\*[A-Z0-9-]{1,11}|[A-Z0-9-]{1,11}\\*)$"
+)
 
 # Airline ICAO Code: e.g., BAW, DLH, RYR
 # - Exactly 3 uppercase letters.
@@ -48,7 +50,7 @@ IATA_FLIGHT_NUMBER_PATTERN = r"^(?i)([A-Z][\d]|[\d][A-Z]|[A-Z]{2})(\d{1,})$"
 # Squawk Code: e.g., 7000, 1234
 # - Exactly 4 digits, each from 0 to 7.
 # - Case-insensitive (though not applicable to digits).
-SQUAWK_PATTERN = r"^(?:[0-7]{4})$" # No /i needed as it's digits only
+SQUAWK_PATTERN = r"^(?:[0-7]{4})$"  # No /i needed as it's digits only
 
 # Alpha-2 Country Code: e.g., US, GB, DE
 # - Exactly 2 uppercase letters.
@@ -74,7 +76,9 @@ AIRPORT_PARAM_PATTERN = r"^(?i)(?:(?:[A-Z0-9]{4}|[A-Z]{3}|[A-Z]{2}),?(\s)*)*(?:(
 # Route List: e.g., "LHR-JFK, CDG-DXB"
 # - Comma-separated list of routes (each route is AAA-BBB or AAAA-BBBB).
 # - Case-insensitive.
-ROUTE_LIST_PATTERN = r"^(?i)[A-Z0-9]{2,4}-[A-Z0-9]{2,4}(?:,(\s)*[A-Z0-9]{2,4}-[A-Z0-9]{2,4})*$"
+ROUTE_LIST_PATTERN = (
+    r"^(?i)[A-Z0-9]{2,4}-[A-Z0-9]{2,4}(?:,(\s)*[A-Z0-9]{2,4}-[A-Z0-9]{2,4})*$"
+)
 
 # Service Types: e.g., P, C, M
 # - Single character from the allowed set: P, C, M, J, T, H, B, G, D, V, O, N.
@@ -84,7 +88,7 @@ SERVICE_TYPES_PATTERN = r"^[PCMJTHBGDVON]$"
 # Data Source: e.g., ADSB, MLAT, ESTIMATED
 # - One of the specified strings: ADSB, MLAT, ESTIMATED.
 # - Case-sensitive as per original regex.
-DATA_SOURCE_PATTERN = r"^(ADSB|MLAT|ESTIMATED)$" 
+DATA_SOURCE_PATTERN = r"^(ADSB|MLAT|ESTIMATED)$"
 
 # Sort pattern: asc or desc
 SORT_PATTERN = r"^(asc|desc)$"

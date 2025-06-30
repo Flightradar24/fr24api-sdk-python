@@ -21,6 +21,7 @@ from .resources import (
 
 logger = logging.getLogger(__name__)
 
+
 class Client:
     """Synchronous Flightradar24 API Client."""
 
@@ -42,11 +43,16 @@ class Client:
             http_client: An optional pre-configured httpx.Client instance.
         """
         transport_kwargs: dict[str, Any] = {}
-        if api_token is not None: transport_kwargs["api_token"] = api_token
-        if base_url is not None: transport_kwargs["base_url"] = base_url
-        if api_version is not None: transport_kwargs["api_version"] = api_version
-        if timeout is not None: transport_kwargs["timeout"] = timeout
-        if http_client is not None: transport_kwargs["http_client"] = http_client
+        if api_token is not None:
+            transport_kwargs["api_token"] = api_token
+        if base_url is not None:
+            transport_kwargs["base_url"] = base_url
+        if api_version is not None:
+            transport_kwargs["api_version"] = api_version
+        if timeout is not None:
+            transport_kwargs["timeout"] = timeout
+        if http_client is not None:
+            transport_kwargs["http_client"] = http_client
 
         self._transport = HttpTransport(**transport_kwargs)
 
@@ -76,4 +82,4 @@ class Client:
     # Convenience property to access the underlying transport if needed for advanced use cases
     @property
     def transport(self) -> HttpTransport:
-        return self._transport 
+        return self._transport

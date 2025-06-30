@@ -16,13 +16,17 @@ from .historic.positions import HistoricPositionsResource
 
 class LiveResource:
     """Namespace for live data resources."""
+
     def __init__(self, transport: HttpTransport):
         self.flight_positions = LivePositionsResource(transport)
 
+
 class HistoricResource:
     """Namespace for historic data resources."""
+
     def __init__(self, transport: HttpTransport):
         self.flight_positions = HistoricPositionsResource(transport)
+
 
 __all__ = [
     "AirlinesResource",
@@ -34,4 +38,4 @@ __all__ = [
     "HistoricResource",
     "LivePositionsResource",
     "HistoricPositionsResource",
-] 
+]
