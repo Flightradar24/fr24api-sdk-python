@@ -18,7 +18,7 @@ from ..models.regex_patterns import (
     CALLSIGN_PATTERN,
     REGISTRATION_PATTERN,
     AIRLINE_ICAO_PATTERN,
-    AIRPORT_CODE_PATTERN,
+    AIRPORT_PARAM_PATTERN,
     ROUTE_PATTERN,
     SORT_PATTERN,
 )
@@ -46,7 +46,7 @@ class _FlightSummaryParams(BaseModel):
         list[Annotated[str, StringConstraints(pattern=AIRLINE_ICAO_PATTERN)]]
     ] = Field(default=None, max_length=15)
     airports: Optional[
-        list[Annotated[str, StringConstraints(pattern=AIRPORT_CODE_PATTERN)]]
+        list[Annotated[str, StringConstraints(pattern=AIRPORT_PARAM_PATTERN)]]
     ] = Field(default=None, max_length=15)
     routes: Optional[list[Annotated[str, StringConstraints(pattern=ROUTE_PATTERN)]]] = (
         Field(default=None, max_length=15)
