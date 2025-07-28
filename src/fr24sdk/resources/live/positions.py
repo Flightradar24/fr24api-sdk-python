@@ -73,7 +73,7 @@ class _LivePositionsParams(BaseModel):
         list[Annotated[str, StringConstraints(pattern=DATA_SOURCE_PATTERN)]]
     ] = Field(default=None, max_length=15)
     airspaces: Optional[list[str]] = Field(default=None, max_length=15)
-    gspeed: Optional[Annotated[int, Field(ge=0, le=5000)]] = None
+    gspeed: Optional[Union[Annotated[int, Field(ge=0, le=5000)], str]] = None
     limit: Optional[Annotated[int, Field(ge=0, le=30000)]] = None
 
     @model_serializer(mode="plain")
@@ -114,7 +114,7 @@ class LivePositionsResource:
         categories: Optional[list[str]] = None,
         data_sources: Optional[list[str]] = None,
         airspaces: Optional[list[str]] = None,
-        gspeed: Optional[int] = None,
+        gspeed: Optional[Union[int, str]] = None,
         limit: Optional[int] = None,
     ) -> FlightPositionsLightResponse:
         """Returns real-time information on aircraft flight movements including latitude, longitude, speed, and altitude. At least one query parameter is required to retrieve data.
@@ -162,7 +162,7 @@ class LivePositionsResource:
         categories: Optional[list[str]] = None,
         data_sources: Optional[list[str]] = None,
         airspaces: Optional[list[str]] = None,
-        gspeed: Optional[int] = None,
+        gspeed: Optional[Union[int, str]] = None,
         limit: Optional[int] = None,
     ) -> FlightPositionsFullResponse:
         """Returns comprehensive real-time information on aircraft flight movements, including flight and aircraft details such as origin, destination, and aircraft type. At least one query parameter is required to retrieve data
@@ -209,7 +209,7 @@ class LivePositionsResource:
         squawks: Optional[list[str]] = None,
         categories: Optional[list[str]] = None,
         data_sources: Optional[list[str]] = None,
-        gspeed: Optional[int] = None,
+        gspeed: Optional[Union[int, str]] = None,
     ) -> CountResponse:
         """Get count of live flight positions.
 
