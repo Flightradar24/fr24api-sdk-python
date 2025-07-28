@@ -79,7 +79,7 @@ class _HistoricPositionsParams(BaseModel):
         list[Annotated[str, StringConstraints(pattern=DATA_SOURCE_PATTERN)]]
     ] = Field(default=None, max_length=15)
     gspeed: Optional[Union[Annotated[int, Field(ge=0, le=5000)], str]] = None
-    limit: Optional[Annotated[int, Field(ge=0, le=30000)]] = None
+    limit: Optional[Annotated[int, Field(ge=1, le=30000)]] = None
 
     @field_validator("timestamp")
     @classmethod

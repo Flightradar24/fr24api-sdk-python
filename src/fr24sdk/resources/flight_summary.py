@@ -53,7 +53,7 @@ class _FlightSummaryParams(BaseModel):
     )
     aircraft: Optional[list[str]] = Field(default=None, max_length=15)
     sort: Optional[Annotated[str, StringConstraints(pattern=SORT_PATTERN)]] = None
-    limit: Optional[Annotated[int, Field(ge=0, le=20000)]] = None
+    limit: Optional[Annotated[int, Field(ge=1, le=20000)]] = None
 
     @model_serializer(mode="plain")
     def _to_query_dict(self) -> dict[str, Any]:
