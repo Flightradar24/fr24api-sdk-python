@@ -108,6 +108,7 @@ class FlightSummaryFull(BaseModel):
     flight_time: Optional[float] = None  # seconds
     actual_distance: Optional[float] = None  # km
     circle_distance: Optional[float] = None  # km
+    category: Optional[str] = None
     hex: Optional[str] = None
     first_seen: Optional[str] = None
     last_seen: Optional[str] = None
