@@ -21,6 +21,25 @@ class Country(BaseModel):
     name: str
 
 
+class Surface(BaseModel):
+    """Represents runway surface information."""
+
+    type: str
+    description: str
+
+
+class Runway(BaseModel):
+    """Represents runway information."""
+
+    designator: str
+    heading: int
+    length: int
+    width: int
+    elevation: int
+    thr_coordinates: list[float]
+    surface: Surface
+
+
 class AirportLight(BaseModel):
     """Basic airport information."""
 
@@ -42,3 +61,4 @@ class AirportFull(BaseModel):
     iata: Optional[str] = None
     icao: Optional[str] = None
     state: Optional[str] = None
+    runways: Optional[list[Runway]] = None
