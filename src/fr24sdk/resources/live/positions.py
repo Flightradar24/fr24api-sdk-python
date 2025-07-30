@@ -141,10 +141,7 @@ class LivePositionsResource:
         response = self._transport.request(
             "GET", f"{self.BASE_PATH}/light", params=params
         )
-        if response.json():
-            return FlightPositionsLightResponse(**response.json())
-        else:
-            return FlightPositionsLightResponse(data=[])
+        return FlightPositionsLightResponse(**response.json())
 
     def get_full(
         self,
@@ -189,10 +186,7 @@ class LivePositionsResource:
         response = self._transport.request(
             "GET", f"{self.BASE_PATH}/full", params=params
         )
-        if response.json():
-            return FlightPositionsFullResponse(**response.json())
-        else:
-            return FlightPositionsFullResponse(data=[])
+        return FlightPositionsFullResponse(**response.json())
 
     def count(
         self,
