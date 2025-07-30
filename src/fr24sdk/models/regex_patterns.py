@@ -6,12 +6,12 @@
 # Flightradar24 API
 RADAR_CODE_REGEXP = r"^(?:[A-Z0-9-]{5,10})$"
 
-# Flight Number: e.g., BA2490, U28171, DLH4LF, ACA888T
-# - Allows 2 or 3 letters for airline code.
-# - Allows 1 to 4 digits for flight number.
-# - Allows an optional single letter suffix.
+# Flight Number: e.g., BA2490, U28171, DLH4LF, ACA888T, 5Y8529
+# - Allows 1-3 letters for airline code followed by 1-4 digits and optional letter suffix.
+# - Allows char-numeric IATA codes: digit + letter + digits (e.g., 5Y8529).
+# - Allows letter + digit + digits pattern.
 # - Case-insensitive.
-FLIGHT_NUMBER_PATTERN = r"^(?i)(?:[A-Z]{2}[0-9]{1,4}[A-Z]?|[A-Z]{3}[0-9]{1,4}[A-Z]?)$"
+FLIGHT_NUMBER_PATTERN = r"^(?i)(?:[A-Z]{1,3}[0-9]{1,4}[A-Z]?|[0-9][A-Z][0-9]{1,4}|[A-Z][0-9][0-9]{1,4})$"
 
 # Callsign: e.g., BAW123, EIN45X, RYR88, *EIN45X, EIN45X*
 # - 3 to 8 alphanumeric characters or hyphens.

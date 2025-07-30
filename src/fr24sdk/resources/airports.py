@@ -3,11 +3,12 @@
 # SPDX-License-Identifier: MIT
 """Resource class for interacting with airport-related API endpoints."""
 
-from typing import Optional
+from typing import Optional, Annotated
+from pydantic import StringConstraints
 
 from ..transport import HttpTransport
 from ..models.airport import AirportLight, AirportFull
-
+from ..models.regex_patterns import AIRPORT_CODE_PATTERN
 
 class AirportsResource:
     """Provides access to airport data."""
@@ -15,7 +16,7 @@ class AirportsResource:
     def __init__(self, transport: HttpTransport):
         self._transport = transport
 
-    def get_light(self, code: str) -> Optional[AirportLight]:
+    def get_light(self, code: Annotated[str, StringConstraints(pattern=AIRPORT_CODE_PATTERN)]) -> Optional[AirportLight]:
         """Get basic airport information by IATA or ICAO code.
 
         Args:
@@ -28,7 +29,7 @@ class AirportsResource:
         response = self._transport.request("GET", path)
         return AirportLight(**response.json())
 
-    def get_full(self, code: str) -> Optional[AirportFull]:
+    def get_full(self, code: Annotated[str, StringConstraints(pattern=AIRPORT_CODE_PATTERN)]) -> Optional[AirportFull]:
         """Get detailed airport information by IATA or ICAO code.
 
         Args:

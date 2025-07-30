@@ -78,8 +78,8 @@ class _HistoricPositionsParams(BaseModel):
     data_sources: Optional[
         list[Annotated[str, StringConstraints(pattern=DATA_SOURCE_PATTERN)]]
     ] = Field(default=None, max_length=15)
-    gspeed: Optional[Annotated[int, Field(ge=0, le=5000)]] = None
-    limit: Optional[Annotated[int, Field(ge=0, le=30000)]] = None
+    gspeed: Optional[Union[Annotated[int, Field(ge=0, le=5000)], str]] = None
+    limit: Optional[Annotated[int, Field(ge=1, le=30000)]] = None
 
     @field_validator("timestamp")
     @classmethod
@@ -138,7 +138,7 @@ class HistoricPositionsResource:
         squawks: Optional[list[str]] = None,
         categories: Optional[list[str]] = None,
         data_sources: Optional[list[str]] = None,
-        gspeed: Optional[int] = None,
+        gspeed: Optional[Union[int, str]] = None,
         limit: Optional[int] = None,
     ) -> FlightPositionsLightResponse:
         """Returns comprehensive historical information on aircraft flight movements, including flight and aircraft details such as origin, destination, and aircraft type, dating back to May 11, 2016. At least one query parameter and a history snapshot timestamp are required to retrieve data.
@@ -185,7 +185,7 @@ class HistoricPositionsResource:
         squawks: Optional[list[str]] = None,
         categories: Optional[list[str]] = None,
         data_sources: Optional[list[str]] = None,
-        gspeed: Optional[int] = None,
+        gspeed: Optional[Union[int, str]] = None,
         limit: Optional[int] = None,
     ) -> FlightPositionsFullResponse:
         """Returns comprehensive historical information on aircraft flight movements, including flight and aircraft details such as origin, destination, and aircraft type, dating back to May 11, 2016. At least one query parameter and a history snapshot timestamp are required to retrieve data.
@@ -232,7 +232,7 @@ class HistoricPositionsResource:
         squawks: Optional[list[str]] = None,
         categories: Optional[list[str]] = None,
         data_sources: Optional[list[str]] = None,
-        gspeed: Optional[int] = None,
+        gspeed: Optional[Union[int, str]] = None,
     ) -> CountResponse:
         """Get count of historical flight positions.
 

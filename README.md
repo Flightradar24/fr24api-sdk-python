@@ -185,8 +185,8 @@ except AuthenticationError:
 except ApiError as e:
     print(f"API Error occurred: Status {e.status}, Message: {e.message}")
     print(f"Request URL: {e.request_url}")
-    if e.raw_body:
-        print(f"Raw API response body: {e.raw_body}")
+    if e.body:
+        print(f"Response body: {e.body}")
 except Fr24SdkError as e:
     print(f"An SDK-specific error occurred: {e}")
 except Exception as e:

@@ -28,5 +28,4 @@ class UsageResource:
         response = self._transport.request(
             "GET", self.BASE_PATH, params={"period": period}
         )
-        print(response.json())
         return UsageLogSummaryResponse(**response.json())

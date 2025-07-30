@@ -40,6 +40,21 @@ class ApiError(Fr24SdkError):
         self.body = body  # Parsed JSON body if available, otherwise raw text
         self.headers = response.headers
 
+    @property
+    def status(self) -> int:
+        """Alias for status_code for convenience."""
+        return self.status_code
+
+    @property
+    def message(self) -> str:
+        """Get the error message."""
+        return str(self.args[0]) if self.args else ""
+
+    @property
+    def request_url(self) -> str:
+        """Get the request URL as a string."""
+        return str(self.request.url)
+
     def __str__(self) -> str:
         base_message = super().__str__()
         return f"{self.status_code} {self.response.reason_phrase}: {base_message} (URL: {self.request.url})"

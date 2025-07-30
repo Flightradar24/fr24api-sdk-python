@@ -18,7 +18,7 @@ from ..models.regex_patterns import (
     CALLSIGN_PATTERN,
     REGISTRATION_PATTERN,
     AIRLINE_ICAO_PATTERN,
-    AIRPORT_CODE_PATTERN,
+    AIRPORT_PARAM_PATTERN,
     ROUTE_PATTERN,
     SORT_PATTERN,
 )
@@ -46,14 +46,14 @@ class _FlightSummaryParams(BaseModel):
         list[Annotated[str, StringConstraints(pattern=AIRLINE_ICAO_PATTERN)]]
     ] = Field(default=None, max_length=15)
     airports: Optional[
-        list[Annotated[str, StringConstraints(pattern=AIRPORT_CODE_PATTERN)]]
+        list[Annotated[str, StringConstraints(pattern=AIRPORT_PARAM_PATTERN)]]
     ] = Field(default=None, max_length=15)
     routes: Optional[list[Annotated[str, StringConstraints(pattern=ROUTE_PATTERN)]]] = (
         Field(default=None, max_length=15)
     )
     aircraft: Optional[list[str]] = Field(default=None, max_length=15)
     sort: Optional[Annotated[str, StringConstraints(pattern=SORT_PATTERN)]] = None
-    limit: Optional[Annotated[int, Field(ge=0, le=20000)]] = None
+    limit: Optional[Annotated[int, Field(ge=1, le=20000)]] = None
 
     @model_serializer(mode="plain")
     def _to_query_dict(self) -> dict[str, Any]:

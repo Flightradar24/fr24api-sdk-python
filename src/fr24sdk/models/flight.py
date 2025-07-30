@@ -73,6 +73,7 @@ class FlightSummaryLight(BaseModel):
     orig_icao: Optional[str] = None
     datetime_takeoff: Optional[str] = None  # YYYY-MM-DDTHH:MM:SS
     dest_icao: Optional[str] = None
+    dest_icao_actual: Optional[str] = None
     datetime_landed: Optional[str] = None  # YYYY-MM-DDTHH:MM:SS
     hex: Optional[str] = None
     first_seen: Optional[str] = None  # YYYY-MM-DDTHH:MM:SS
@@ -107,6 +108,7 @@ class FlightSummaryFull(BaseModel):
     flight_time: Optional[float] = None  # seconds
     actual_distance: Optional[float] = None  # km
     circle_distance: Optional[float] = None  # km
+    category: Optional[str] = None
     hex: Optional[str] = None
     first_seen: Optional[str] = None
     last_seen: Optional[str] = None
