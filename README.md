@@ -13,7 +13,7 @@ Python SDK for the [Flightradar24 API](https://fr24api.flightradar24.com).
 
 ## Installation
 
-### Release Version (TBD)
+### Release Version
 **Using pip:**
 ```bash
 pip install fr24sdk
