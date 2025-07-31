@@ -80,13 +80,8 @@ class HistoricEventsResource:
         gate movements, and airspace transitions.
 
         Args:
-            flight_ids: Flight IDs to filter by. Can be:
-                - String: Comma-separated fr24_ids like "391fdd79,35f2ffd9"
-                - List: List of fr24_ids like ["391fdd79", "35f2ffd9"]
-                Maximum 15 IDs allowed.
-            event_types: Event types to filter by. Can be:
-                - String: Comma-separated values like "gate_departure,takeoff"
-                - List: List of event types like ["gate_departure", "takeoff"]
+            flight_ids: Flight IDs to filter by. ["391fdd79", "35f2ffd9"]. Maximum 15 IDs allowed.
+            event_types: List of event types like ["gate_departure", "takeoff"]
                 Available values: all, gate_departure, takeoff, cruising, airspace_transition, descent, landed, gate_arrival.
         """
         params = _HistoricEventsParams(
@@ -108,13 +103,8 @@ class HistoricEventsResource:
         origin, destination, and aircraft type.
 
         Args:
-            flight_ids: Flight IDs to filter by. Can be:
-                - String: Comma-separated fr24_ids like "391fdd79,35f2ffd9"
-                - List: List of fr24_ids like ["391fdd79", "35f2ffd9"]
-                Maximum 15 IDs allowed.
-            event_types: Event types to filter by. Can be:
-                - String: Comma-separated values like "gate_departure,takeoff"
-                - List: List of event types like ["gate_departure", "takeoff"]
+            flight_ids: Flight IDs to filter by. ["391fdd79", "35f2ffd9"]. Maximum 15 IDs allowed.
+            event_types: List of event types like ["gate_departure", "takeoff"].
                 Available values: all, gate_departure, takeoff, cruising, airspace_transition, descent, landed, gate_arrival.
         """
         params = _HistoricEventsParams(
