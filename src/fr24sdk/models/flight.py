@@ -186,13 +186,13 @@ class AirspaceDetails(BaseModel):
 class FlightEvent(BaseModel):
     """A single flight event with optional position and details."""
     
-    type: str  # event type like "gate_departure", "takeoff", etc.
+    type: str  # event type
     timestamp: str  # ISO 8601 date-time string
     lat: Optional[float] = None
     lon: Optional[float] = None
     alt: Optional[int] = None
     gspeed: Optional[int] = None
-    details: Optional[Union[GateDetails, TakeoffDetails, LandingDetails, AirspaceDetails]] = None  # Flexible details object that varies by event type
+    details: Optional[Union[GateDetails, TakeoffDetails, LandingDetails, AirspaceDetails]] = None 
 
 
 class FlightEventsLight(BaseModel):
