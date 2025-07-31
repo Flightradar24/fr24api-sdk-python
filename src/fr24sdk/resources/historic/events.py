@@ -3,8 +3,7 @@
 # SPDX-License-Identifier: MIT
 """Resource class for historic flight events data."""
 
-from typing import Optional, Any, Annotated, Union
-from datetime import datetime, timezone
+from typing import Optional, Any
 from pydantic import (
     BaseModel,
     Field,
@@ -34,8 +33,8 @@ VALID_EVENT_TYPES = [
 class _HistoricEventsParams(BaseModel):
     """Validate & serialise historic flight events query parameters."""
 
-    flight_ids: list[str] = Field(default=None, description="fr24_ids (maximum 15 IDs)", max_length=15)
-    event_types: list[str] = Field(default=None, description="Event types to filter by (comma-separated values or list)")
+    flight_ids: list[str] = Field(..., description="fr24_ids (maximum 15 IDs)", max_length=15)
+    event_types: list[str] = Field(..., description="Event types to filter by (comma-separated values or list)")
 
 
     @field_validator("event_types")
