@@ -25,6 +25,8 @@ VALID_EVENT_TYPES = [
     "cruising",
     "airspace_transition",
     "descent",
+    "diverting",
+    "diverted",
     "landed",
     "gate_arrival"
 ]
