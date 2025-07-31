@@ -3,11 +3,10 @@
 # SPDX-License-Identifier: MIT
 """Data models for API usage information."""
 
-from dataclasses import dataclass, field
+from pydantic import BaseModel, Field
 
 
-@dataclass
-class UsageLogSummary:
+class UsageLogSummary(BaseModel):
     """Summary of API usage for a specific endpoint."""
 
     endpoint: str
@@ -15,6 +14,5 @@ class UsageLogSummary:
     credits: int
 
 
-@dataclass
-class UsageLogSummaryResponse:
-    data: list[UsageLogSummary] = field(default_factory=list)
+class UsageLogSummaryResponse(BaseModel):
+    data: list[UsageLogSummary] = Field(default_factory=list)
