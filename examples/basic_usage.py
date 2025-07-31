@@ -43,6 +43,9 @@ def main() -> None:
         flight_tracks = client.flight_tracks.get(flight_id="3a55c027")
         if flight_tracks.data:
             print(flight_tracks.data[0].fr24_id)
+
+        print(client.historic.events.get_full(flight_ids=["3a55c027"], event_types=["all"]))
+        print(client.historic.events.get_light(flight_ids=["3a55c027"], event_types=["all"]))
         print(client.usage.get())
 
 if __name__ == "__main__":

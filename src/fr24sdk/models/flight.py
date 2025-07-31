@@ -4,7 +4,7 @@
 # Note: Refer to Flightradar24 API documentation for more information on the fields.
 """Data models for flight information, positions, summaries, and tracks."""
 
-from typing import Optional
+from typing import Optional, Union
 from pydantic import BaseModel, Field
 
 
@@ -149,3 +149,79 @@ class CountResponse(BaseModel):
     """Generic count response."""
 
     record_count: int
+
+
+# Flight Events Models
+
+class GateDetails(BaseModel):
+    """Gate-related details for gate departure/arrival events."""
+    
+    gate_ident: Optional[str] = None
+    gate_lat: Optional[float] = None
+    gate_lon: Optional[float] = None
+
+
+class LandingDetails(BaseModel):
+    """Runway-related details for landing events."""
+
+    landed_icao: Optional[str] = None
+    landed_runway: Optional[str] = None
+
+
+class TakeoffDetails(BaseModel):
+    """Takeoff-related details for takeoff events."""
+
+    takeoff_runway: Optional[str] = None
+
+
+class AirspaceDetails(BaseModel):
+    """Airspace transition details."""
+    
+    exited_airspace: Optional[str] = None
+    exited_airspace_id: Optional[str] = None
+    entered_airspace: Optional[str] = None
+    entered_airspace_id: Optional[str] = None
+
+
+class FlightEvent(BaseModel):
+    """A single flight event with optional position and details."""
+    
+    type: str  # event type
+    timestamp: str  # ISO 8601 date-time string
+    lat: Optional[float] = None
+    lon: Optional[float] = None
+    alt: Optional[int] = None
+    gspeed: Optional[int] = None
+    details: Optional[Union[GateDetails, TakeoffDetails, LandingDetails, AirspaceDetails]] = None 
+
+
+class FlightEventsLight(BaseModel):
+    """Lightweight flight events data."""
+    
+    fr24_id: str
+    callsign: Optional[str] = None
+    hex: Optional[str] = None
+    events: Optional[list[FlightEvent]] = Field(default_factory=list)
+
+
+class FlightEventsLightResponse(BaseModel):
+    data: Optional[list[FlightEventsLight]] = Field(default_factory=list)
+
+
+class FlightEventsFull(BaseModel):
+    """Full flight events data with additional flight information."""
+    
+    fr24_id: str
+    callsign: Optional[str] = None
+    hex: Optional[str] = None
+    operating_as: Optional[str] = None
+    painted_as: Optional[str] = None
+    orig_iata: Optional[str] = None
+    orig_icao: Optional[str] = None
+    dest_iata: Optional[str] = None
+    dest_icao: Optional[str] = None
+    events: Optional[list[FlightEvent]] = Field(default_factory=list)
+
+
+class FlightEventsFullResponse(BaseModel):
+    data: Optional[list[FlightEventsFull]] = Field(default_factory=list)
