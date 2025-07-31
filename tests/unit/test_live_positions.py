@@ -105,7 +105,7 @@ class TestLivePositionsResource:
         """Test get_light with empty response."""
         # Mock empty response
         mock_response = MagicMock()
-        mock_response.json.return_value = None
+        mock_response.json.return_value = {"data": []}
         mock_transport.request.return_value = mock_response
 
         # Call method
@@ -163,7 +163,7 @@ class TestLivePositionsResource:
         """Test get_full with empty response."""
         # Mock empty response
         mock_response = MagicMock()
-        mock_response.json.return_value = None
+        mock_response.json.return_value = {"data": []}
         mock_transport.request.return_value = mock_response
 
         # Call method
