@@ -26,7 +26,7 @@ class HistoricResource:
 
     def __init__(self, transport: HttpTransport):
         self.flight_positions = HistoricPositionsResource(transport)
-        self.events = HistoricEventsResource(transport)
+        self.flight_events = HistoricEventsResource(transport)
 
 __all__ = [
     "AirlinesResource",
