@@ -34,10 +34,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/flightradar24/fr24api-sdk"
-Documentation = "https://github.com/flightradar24/fr24api-sdk/blob/main/docs/README.md"
-Repository = "https://github.com/flightradar24/fr24api-sdk"
-Changelog = "https://github.com/flightradar24/fr24api-sdk/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/flightradar24/fr24api-sdk-python"
+Documentation = "https://github.com/flightradar24/fr24api-sdk-python/blob/main/docs/README.md"
+Repository = "https://github.com/flightradar24/fr24api-sdk-python"
+Changelog = "https://github.com/flightradar24/fr24api-sdk-python/blob/main/CHANGELOG.md"
 
 [dependency-groups]
 dev = [
