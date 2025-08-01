@@ -1,6 +1,6 @@
 # Flightradar24 Python SDK
 
-Python SDK for the [Flightradar24 API](https://fr24api.flightradar24.com).
+Official Python SDK for the [Flightradar24 API](https://fr24api.flightradar24.com).
 
 ## Features
 
@@ -14,41 +14,14 @@ Python SDK for the [Flightradar24 API](https://fr24api.flightradar24.com).
 ## Installation
 
 ### Release Version
-**Using pip:**
-```bash
-pip install fr24sdk
-```
-
 **Using uv:**
 ```bash
 uv pip install fr24sdk
 ```
 
-### Github version
 **Using pip:**
 ```bash
-pip install https://github.com/Flightradar24/fr24api-sdk-python
-```
-
-**Using uv:**
-```bash
-uv pip install https://github.com/Flightradar24/fr24api-sdk-python
-```
-
-
-**Setting up the environment with pip:**
-```bash
-python -m venv .venv
-source .venv/bin/activate # or .venv\Scripts\activate on Windows
-pip install -e ".[dev]"
-```
-
-**Setting up the environment with uv:**
-```bash
-# Ensure uv is installed (e.g., pip install uv)
-uv venv .venv # Creates a virtual environment using uv
-source .venv/bin/activate # or .venv\Scripts\activate on Windows
-uv pip install -e ".[dev]"
+pip install fr24sdk
 ```
 
 ## SDK Usage Guide
@@ -59,7 +32,7 @@ This guide provides a comprehensive overview of how to use the `fr24sdk` to inte
 
 The `Client` is your main entry point to the API.
 
-**Using Environment Variable (Recommended):**
+**Using Environment Variable:**
 
 Ensure your API token is set as an environment variable `FR24_API_TOKEN`.
 ```bash
@@ -116,11 +89,6 @@ This example demonstrates fetching detailed information for an airport (e.g., Wa
 ```python
 from fr24sdk.client import Client
 from fr24sdk.exceptions import ApiError
-
-# Assumes client is initialized (e.g., via environment variable or by passing a token)
-# For robust error handling and resource management, using a context manager is recommended:
-# with Client() as client:
-#     # your code here
 
 # Initialize client (ensure FR24_API_TOKEN is set or pass api_token="your_token")
 client = Client()
