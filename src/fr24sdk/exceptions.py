@@ -66,6 +66,21 @@ class AuthenticationError(ApiError):
     pass
 
 
+class NoApiKeyError(Fr24SdkError):
+    """Indicates that no API key was provided for authentication.
+    
+    This is a specific type of authentication error that occurs when the SDK
+    is used without providing an API token, either through the constructor
+    or the FR24_API_TOKEN environment variable.
+    
+    Unlike other ApiError subclasses, this error is raised before any HTTP
+    request is made, so it doesn't include request/response context.
+    """
+
+    def __init__(self, message: str):
+        super().__init__(message)
+
+
 class RateLimitError(ApiError):
     """Indicates that the API rate limit has been exceeded (402 Payment Required or 429 Too Many Requests)."""
 
