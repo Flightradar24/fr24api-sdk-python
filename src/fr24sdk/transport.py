@@ -12,6 +12,7 @@ import httpx
 from .exceptions import (
     ApiError,
     AuthenticationError,
+    NoApiKeyError,
     RateLimitError,
     TransportError,
     PaymentRequiredError,
@@ -72,6 +73,14 @@ class HttpTransport:
         headers: Optional[Mapping[str, str]] = None,
     ) -> httpx.Response:
         """Makes an HTTP request to the API."""
+
+        # Check if API token is available before making the request
+        if not self.api_token:
+            raise NoApiKeyError(
+                "No API key provided. Please set the FR24_API_TOKEN environment variable "
+                "or pass an api_token parameter when creating the Client. "
+                "For more information, see https://fr24api.flightradar24.com/docs"
+            )
 
         request_headers = self._get_default_headers()
         if headers:
