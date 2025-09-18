@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 """Flightradar24 API SDK for Python."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from .client import Client
 
