@@ -61,7 +61,7 @@ class _HistoricEventsParams(BaseModel):
             if isinstance(value, list):
                 query[key] = ",".join(map(str, value))
             else:
-                query[key] = value
+                query[key] = str(value)
         return query
 
 
