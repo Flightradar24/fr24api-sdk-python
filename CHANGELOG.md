@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - No provided key class
 - String converstion in query parameters fix. Addressing [#15](https://github.com/Flightradar24/fr24api-sdk-python/issues/15) 
 
-[0.2.0]: https://github.com/flightradar24/fr24api-sdk-python/releases/tag/v0.1.0
+[0.2.0]: https://github.com/flightradar24/fr24api-sdk-python/releases/tag/v0.2.0
 
 ## [0.1.0] - 2025-08-04
 
