@@ -6,7 +6,7 @@
 from enum import Enum
 
 
-class FlightCategory(Enum):
+class FlightCategory(str, Enum):
     """Enumeration of FlightRadar24 flight categories.
     
     Maps character literals used by the FR24 API to identify different
@@ -25,3 +25,6 @@ class FlightCategory(Enum):
     GROUND_VEHICLES = "V"
     OTHER = "O"
     NON_CATEGORIZED = "N"
+
+    def __str__(self) -> str:
+        return self.value
