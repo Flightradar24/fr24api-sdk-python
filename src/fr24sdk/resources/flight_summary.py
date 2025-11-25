@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 """Resource class for flight summary data."""
 
+import warnings
 from typing import Optional, Any, Annotated
 from datetime import datetime
 from pydantic import BaseModel, model_serializer, StringConstraints, Field
@@ -166,7 +167,7 @@ class FlightSummaryResource:
         )
         return FlightSummaryFullResponse(**response.json())
 
-    def count(
+    def get_count(
         self,
         *,
         flight_ids: Optional[list[str]] = None,
@@ -203,3 +204,39 @@ class FlightSummaryResource:
             "GET", f"{self.BASE_PATH}/count", params=params
         )
         return CountResponse(**response.json())
+
+    def count(
+        self,
+        *,
+        flight_ids: Optional[list[str]] = None,
+        flight_datetime_from: Optional[datetime] = None,
+        flight_datetime_to: Optional[datetime] = None,
+        flights: Optional[list[str]] = None,
+        callsigns: Optional[list[str]] = None,
+        registrations: Optional[list[str]] = None,
+        painted_as: Optional[list[str]] = None,
+        operating_as: Optional[list[str]] = None,
+        airports: Optional[list[str]] = None,
+        routes: Optional[list[str]] = None,
+        aircraft: Optional[list[str]] = None,
+    ) -> CountResponse:
+        """Deprecated alias for :meth:`get_count`."""
+        warnings.warn(
+            "The `count()` method is deprecated and will be removed in a future version. "
+            "Please use `get_count()` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.get_count(
+            flight_ids=flight_ids,
+            flight_datetime_from=flight_datetime_from,
+            flight_datetime_to=flight_datetime_to,
+            flights=flights,
+            callsigns=callsigns,
+            registrations=registrations,
+            painted_as=painted_as,
+            operating_as=operating_as,
+            airports=airports,
+            routes=routes,
+            aircraft=aircraft,
+        )

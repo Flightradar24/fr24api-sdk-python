@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 """Resource class for historic flight position data."""
 
+import warnings
 from typing import Optional, Any, Annotated, Union
 from datetime import datetime, timezone
 from pydantic import (
@@ -217,7 +218,7 @@ class HistoricPositionsResource:
         )
         return FlightPositionsFullResponse(**response.json())
 
-    def count(
+    def get_count(
         self,
         timestamp: Union[int, datetime],
         bounds: Optional[Union[Boundary, str]] = None,
@@ -262,3 +263,46 @@ class HistoricPositionsResource:
             "GET", f"{self.BASE_PATH}/count", params=params
         )
         return CountResponse(**response.json())
+
+    def count(
+        self,
+        timestamp: Union[int, datetime],
+        bounds: Optional[Union[Boundary, str]] = None,
+        flights: Optional[list[str]] = None,
+        callsigns: Optional[list[str]] = None,
+        registrations: Optional[list[str]] = None,
+        painted_as: Optional[list[str]] = None,
+        operating_as: Optional[list[str]] = None,
+        airports: Optional[list[str]] = None,
+        routes: Optional[list[str]] = None,
+        aircraft: Optional[str] = None,
+        altitude_ranges: Optional[list[Union[AltitudeRange, str]]] = None,
+        squawks: Optional[list[str]] = None,
+        categories: Optional[list[str]] = None,
+        data_sources: Optional[list[str]] = None,
+        gspeed: Optional[Union[int, str]] = None,
+    ) -> CountResponse:
+        """Deprecated alias for :meth:`get_count`."""
+        warnings.warn(
+            "The `count()` method is deprecated and will be removed in a future version. "
+            "Please use `get_count()` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.get_count(
+            timestamp=timestamp,
+            bounds=bounds,
+            flights=flights,
+            callsigns=callsigns,
+            registrations=registrations,
+            painted_as=painted_as,
+            operating_as=operating_as,
+            airports=airports,
+            routes=routes,
+            aircraft=aircraft,
+            altitude_ranges=altitude_ranges,
+            squawks=squawks,
+            categories=categories,
+            data_sources=data_sources,
+            gspeed=gspeed,
+        )
