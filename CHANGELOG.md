@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.3.0] - 2025-11-25
+- Addressing adding Enumerate with FR24 Categories to Flight Position methods [#18](https://github.com/Flightradar24/fr24api-sdk-python/issues/18)
+- Renaming `count()` method to `get_count()` to keep things consistant
+
+[0.3.0]: https://github.com/flightradar24/fr24api-sdk-python/releases/tag/v0.3.0
+
 ## [0.2.0] - 2025-09-18
 
 ### Added
