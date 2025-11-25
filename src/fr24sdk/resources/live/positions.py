@@ -17,6 +17,7 @@ from ...models.flight import (
     FlightPositionsFullResponse,
     CountResponse,
 )
+from ...models.flight_category import FlightCategory
 from ...models.geographic import (
     Boundary,
     AltitudeRange,
@@ -67,7 +68,7 @@ class _LivePositionsParams(BaseModel):
         list[Annotated[str, StringConstraints(pattern=SQUAWK_PATTERN)]]
     ] = Field(default=None, max_length=15)
     categories: Optional[
-        list[Annotated[str, StringConstraints(pattern=SERVICE_TYPES_PATTERN)]]
+        list[Union[FlightCategory, Annotated[str, StringConstraints(pattern=SERVICE_TYPES_PATTERN)]]]
     ] = Field(default=None, max_length=15)
     data_sources: Optional[
         list[Annotated[str, StringConstraints(pattern=DATA_SOURCE_PATTERN)]]
@@ -111,7 +112,7 @@ class LivePositionsResource:
         aircraft: Optional[str] = None,
         altitude_ranges: Optional[list[Union[AltitudeRange, str]]] = None,
         squawks: Optional[list[str]] = None,
-        categories: Optional[list[str]] = None,
+        categories: Optional[list[Union[FlightCategory, str]]] = None,
         data_sources: Optional[list[str]] = None,
         airspaces: Optional[list[str]] = None,
         gspeed: Optional[Union[int, str]] = None,
@@ -156,7 +157,7 @@ class LivePositionsResource:
         aircraft: Optional[str] = None,
         altitude_ranges: Optional[list[Union[AltitudeRange, str]]] = None,
         squawks: Optional[list[str]] = None,
-        categories: Optional[list[str]] = None,
+        categories: Optional[list[Union[FlightCategory, str]]] = None,
         data_sources: Optional[list[str]] = None,
         airspaces: Optional[list[str]] = None,
         gspeed: Optional[Union[int, str]] = None,
@@ -201,7 +202,7 @@ class LivePositionsResource:
         aircraft: Optional[str] = None,
         altitude_ranges: Optional[list[Union[AltitudeRange, str]]] = None,
         squawks: Optional[list[str]] = None,
-        categories: Optional[list[str]] = None,
+        categories: Optional[list[Union[FlightCategory, str]]] = None,
         data_sources: Optional[list[str]] = None,
         gspeed: Optional[Union[int, str]] = None,
     ) -> CountResponse:

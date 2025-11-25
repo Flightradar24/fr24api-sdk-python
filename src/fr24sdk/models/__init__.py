@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 """Exposes data models for the Flightradar24 SDK."""
 
+from .flight_category import FlightCategory
 from .airline import AirlineLight
 from .airport import AirportFull, AirportLight, Country, Timezone
 from .flight import (
@@ -27,6 +28,7 @@ from .usage import UsageLogSummary, UsageLogSummaryResponse
 
 __all__ = [
     "AirlineLight",
+    "FlightCategory",
     "AirportFull",
     "AirportLight",
     "Country",
