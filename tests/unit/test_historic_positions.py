@@ -75,12 +75,12 @@ class TestHistoricPositionsParams:
         serialized = params._to_query_dict()
 
         # Check serialization results
-        assert isinstance(serialized["timestamp"], int)
+        assert serialized["timestamp"] == str(int(datetime(2020, 1, 1, tzinfo=timezone.utc).timestamp()))
         assert serialized["bounds"] == "10,20,30,40"
         assert serialized["flights"] == "AB1234,CD5678"
         assert serialized["callsigns"] == "ABC123"
         assert serialized["altitude_ranges"] == "1000,5000,10000,20000"
-        assert serialized["limit"] == 100
+        assert serialized["limit"] == "100"
 
         # Check that None values are not included
         assert "registrations" not in serialized
@@ -143,7 +143,7 @@ class TestHistoricPositionsResource:
         assert args[0] == "GET"
         assert args[1] == "/api/historic/flight-positions/light"
         assert "timestamp" in kwargs["params"]
-        assert kwargs["params"]["timestamp"] == 1672574400
+        assert kwargs["params"]["timestamp"] == "1672574400"
 
     def test_get_light_empty_response(self, historic_positions, mock_transport):
         """Test get_light with empty response."""
