@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 ## [0.3.1] - 2026-03-16
-- Addressing dependency versions (#21)
+- Addressing dependencies versions (#21)
 
 [0.3.1]: https://github.com/flightradar24/fr24api-sdk-python/releases/tag/v0.3.1
 
