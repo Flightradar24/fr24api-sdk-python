@@ -22,15 +22,16 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Operating System :: OS Independent",
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
 dependencies = [
-  "httpx>=0.26,<0.28",
+  "httpx>=0.28,<1.0",
   "exceptiongroup; python_version < '3.11'",
-  "tenacity>=8.2,<9.0",
-  "pydantic>=2.10.6,<2.11.0"
+  "tenacity>=8.2,<10.0",
+  "pydantic>=2.10.6,<3.0"
 ]
 
 [project.urls]
