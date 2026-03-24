@@ -9,6 +9,7 @@ from typing import Any, Optional, Union, Mapping, Sequence, Type
 
 import httpx
 
+from . import __version__
 from .exceptions import (
     ApiError,
     AuthenticationError,
@@ -25,6 +26,7 @@ logger = logging.getLogger(__name__)
 DEFAULT_BASE_URL = "https://fr24api.flightradar24.com"
 DEFAULT_API_VERSION = "v1"
 DEFAULT_TIMEOUT_SECONDS = 30
+DEFAULT_USER_AGENT = f"FR24 API Python SDK/{__version__}"
 
 
 class HttpTransport:
@@ -57,6 +59,7 @@ class HttpTransport:
         headers = {
             "Accept": "application/json",
             "Accept-Version": self.api_version,
+            "User-Agent": DEFAULT_USER_AGENT,
         }
         if self.api_token:
             headers["Authorization"] = f"Bearer {self.api_token}"
