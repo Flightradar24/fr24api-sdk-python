@@ -14,6 +14,7 @@ from fr24sdk.transport import (
     DEFAULT_BASE_URL,
     DEFAULT_API_VERSION,
     DEFAULT_TIMEOUT_SECONDS,
+    DEFAULT_USER_AGENT,
 )
 from fr24sdk.exceptions import (
     ApiError,
@@ -122,6 +123,7 @@ def test_default_headers(transport: HttpTransport) -> None:
     headers = transport._get_default_headers()
     assert headers["Accept"] == "application/json"
     assert headers["Accept-Version"] == DEFAULT_API_VERSION
+    assert headers["User-Agent"] == DEFAULT_USER_AGENT
     assert headers["Authorization"] == f"Bearer {TEST_TOKEN}"
 
 
@@ -170,6 +172,7 @@ def test_request_with_params_and_custom_headers() -> None:  # Removed respx_rout
     sent_headers = route.calls.last.request.headers
     assert sent_headers["x-custom-header"] == "custom_value"
     assert sent_headers["accept"] == "application/json"
+    assert sent_headers["user-agent"] == DEFAULT_USER_AGENT
     assert sent_headers["authorization"] == f"Bearer {TEST_TOKEN}"
 
 
