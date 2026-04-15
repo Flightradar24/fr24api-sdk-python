@@ -13,6 +13,7 @@ import logging
 from datetime import datetime, timezone
 
 from fr24sdk.client import Client
+from fr24sdk.models.flight_category import FlightCategory
 from fr24sdk.models.geographic import AltitudeRange, Boundary
 
 # Configure basic logging to see SDK informational messages
@@ -31,6 +32,7 @@ def main() -> None:
         flight_summary = client.flight_summary.get_light(flights=["KL1316"], flight_datetime_from=datetime(2025, 5, 13, 12, 0, 0), flight_datetime_to=datetime(2025, 5, 14, 17, 10, 0))
         if flight_summary.data:
             print(flight_summary.data[0].fr24_id)
+        print(client.flight_summary.get_full(operating_as=["FDX"],flight_datetime_from=datetime(2026, 1, 15, 15, 0, 0),flight_datetime_to=datetime(2026, 1, 15, 15, 5, 0),categories=[FlightCategory.CARGO]))
         print(client.live.flight_positions.get_light(flights=["SK2752"]))
         print(client.live.flight_positions.get_light(bounds=Boundary(north=55.6, south=55.5, west=12.5, east=12.6)))
         print(client.live.flight_positions.get_full(bounds="55.6,55.5,12.5,12.6"))

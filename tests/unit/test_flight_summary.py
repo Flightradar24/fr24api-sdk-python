@@ -9,11 +9,29 @@ from datetime import datetime, timezone
 
 from fr24sdk.resources.flight_summary import FlightSummaryResource, _FlightSummaryParams
 from fr24sdk.models.flight import (
+    FlightSummaryFull,
     FlightSummaryLightResponse,
     FlightSummaryFullResponse,
     CountResponse,
 )
+from fr24sdk.models.flight_category import FlightCategory
 from fr24sdk.transport import HttpTransport
+
+
+class TestFlightSummaryFullCategory:
+    """Parsing of ``category`` on :class:`FlightSummaryFull`."""
+
+    def test_known_code_coerces_to_enum(self) -> None:
+        row = FlightSummaryFull.model_validate({"fr24_id": "abc", "category": "M"})
+        assert row.category == FlightCategory.MILITARY_AND_GOVERNMENT
+
+    def test_unknown_code_left_as_str(self) -> None:
+        row = FlightSummaryFull.model_validate({"fr24_id": "abc", "category": "X"})
+        assert row.category == "X"
+
+    def test_category_omitted_is_none(self) -> None:
+        row = FlightSummaryFull.model_validate({"fr24_id": "abc"})
+        assert row.category is None
 
 
 class TestFlightSummaryParams:
@@ -39,6 +57,13 @@ class TestFlightSummaryParams:
         assert serialized["flights"] == "BA1234,LH5678"
         assert serialized["callsigns"] == "BAW123"
         assert serialized["aircraft"] == "B738,A320"
+
+        params_with_cat = _FlightSummaryParams(
+            flight_datetime_from=test_datetime,
+            flight_datetime_to=test_datetime,
+            categories=[FlightCategory.PASSENGER, "C"],
+        )
+        assert params_with_cat._to_query_dict()["categories"] == "P,C"
 
         # Check that None values are not included
         assert "registrations" not in serialized
@@ -162,6 +187,7 @@ class TestFlightSummaryResource:
                     "flight_time": 3600,
                     "actual_distance": 250.5,
                     "circle_distance": 230.0,
+                    "category": "P",
                     "hex": "40123A",
                     "first_seen": "2023-01-01T09:45:00Z",
                     "last_seen": "2023-01-01T11:15:00Z",
@@ -179,13 +205,13 @@ class TestFlightSummaryResource:
         result = flight_summary.get_full(flight_ids=["35f2ffd9"])
 
         # Verify results
-        print(result)
         assert isinstance(result, FlightSummaryFullResponse)
         assert len(result.data) == 1
         assert result.data[0].fr24_id == "35f2ffd9"
         assert result.data[0].flight == "BA1234"
         assert result.data[0].runway_takeoff == "27L"
         assert result.data[0].flight_time == 3600
+        assert result.data[0].category == FlightCategory.PASSENGER
 
         # Verify mock was called correctly
         mock_transport.request.assert_called_once()

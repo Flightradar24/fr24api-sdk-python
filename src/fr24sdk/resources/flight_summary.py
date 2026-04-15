@@ -4,11 +4,12 @@
 """Resource class for flight summary data."""
 
 import warnings
-from typing import Optional, Any, Annotated
+from typing import Optional, Any, Annotated, Union
 from datetime import datetime
 from pydantic import BaseModel, model_serializer, StringConstraints, Field
 
 from ..transport import HttpTransport
+from ..models.flight_category import FlightCategory
 from ..models.flight import (
     FlightSummaryLightResponse,
     FlightSummaryFullResponse,
@@ -21,6 +22,7 @@ from ..models.regex_patterns import (
     AIRLINE_ICAO_PATTERN,
     AIRPORT_PARAM_PATTERN,
     ROUTE_PATTERN,
+    SERVICE_TYPES_PATTERN,
     SORT_PATTERN,
 )
 
@@ -53,6 +55,9 @@ class _FlightSummaryParams(BaseModel):
         Field(default=None, max_length=15)
     )
     aircraft: Optional[list[str]] = Field(default=None, max_length=15)
+    categories: Optional[
+        list[Union[FlightCategory, Annotated[str, StringConstraints(pattern=SERVICE_TYPES_PATTERN)]]]
+    ] = Field(default=None, max_length=15)
     sort: Optional[Annotated[str, StringConstraints(pattern=SORT_PATTERN)]] = None
     limit: Optional[Annotated[int, Field(ge=1, le=20000)]] = None
 
@@ -97,6 +102,7 @@ class FlightSummaryResource:
         airports: Optional[list[str]] = None,
         routes: Optional[list[str]] = None,
         aircraft: Optional[list[str]] = None,
+        categories: Optional[list[str]] = None,
         sort: Optional[str] = None,
         limit: Optional[int] = None,
     ) -> FlightSummaryLightResponse:
@@ -118,6 +124,7 @@ class FlightSummaryResource:
             airports=airports,
             routes=routes,
             aircraft=aircraft,
+            categories=categories,
             sort=sort,
             limit=limit,
         ).model_dump(exclude_none=True)
@@ -140,6 +147,7 @@ class FlightSummaryResource:
         airports: Optional[list[str]] = None,
         routes: Optional[list[str]] = None,
         aircraft: Optional[list[str]] = None,
+        categories: Optional[list[str]] = None,
         sort: Optional[str] = None,
         limit: Optional[int] = None,
     ) -> FlightSummaryFullResponse:
@@ -159,6 +167,7 @@ class FlightSummaryResource:
             airports=airports,
             routes=routes,
             aircraft=aircraft,
+            categories=categories,
             sort=sort,
             limit=limit,
         ).model_dump(exclude_none=True)
@@ -181,6 +190,7 @@ class FlightSummaryResource:
         airports: Optional[list[str]] = None,
         routes: Optional[list[str]] = None,
         aircraft: Optional[list[str]] = None,
+        categories: Optional[list[str]] = None,
     ) -> CountResponse:
         """Return the number of flight-summary records that match the filters.
 
@@ -199,6 +209,7 @@ class FlightSummaryResource:
             airports=airports,
             routes=routes,
             aircraft=aircraft,
+            categories=categories,
         ).model_dump(exclude_none=True)
         response = self._transport.request(
             "GET", f"{self.BASE_PATH}/count", params=params
@@ -219,6 +230,7 @@ class FlightSummaryResource:
         airports: Optional[list[str]] = None,
         routes: Optional[list[str]] = None,
         aircraft: Optional[list[str]] = None,
+        categories: Optional[list[str]] = None,
     ) -> CountResponse:
         """Deprecated alias for :meth:`get_count`."""
         warnings.warn(
@@ -239,4 +251,5 @@ class FlightSummaryResource:
             airports=airports,
             routes=routes,
             aircraft=aircraft,
+            categories=categories,
         )
