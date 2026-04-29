@@ -452,6 +452,13 @@ def test_socket_options_include_keepalive():
     sock_opts = pool._socket_options
     # SO_KEEPALIVE must always be present
     assert (_socket.SOL_SOCKET, _socket.SO_KEEPALIVE, 1) in sock_opts
+    # TCP keepalive tuning constants should be present when the platform supports them
+    if hasattr(_socket, "TCP_KEEPIDLE"):
+        assert (_socket.IPPROTO_TCP, _socket.TCP_KEEPIDLE, 60) in sock_opts
+    if hasattr(_socket, "TCP_KEEPINTVL"):
+        assert (_socket.IPPROTO_TCP, _socket.TCP_KEEPINTVL, 10) in sock_opts
+    if hasattr(_socket, "TCP_KEEPCNT"):
+        assert (_socket.IPPROTO_TCP, _socket.TCP_KEEPCNT, 3) in sock_opts
     trans.close()
 
 
