@@ -4,6 +4,7 @@
 """Handles low-level HTTP communication with the Flightradar24 API."""
 
 import os
+import socket
 import logging
 from typing import Any, Optional, Union, Mapping, Sequence, Type
 
@@ -25,13 +26,34 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_BASE_URL = "https://fr24api.flightradar24.com"
 DEFAULT_API_VERSION = "v1"
-DEFAULT_TIMEOUT_SECONDS = 30
 DEFAULT_USER_AGENT = f"FR24 API Python SDK/{__version__}"
+DEFAULT_TIMEOUT = httpx.Timeout(connect=10, read=30, write=10, pool=5)
 DEFAULT_POOL_LIMITS = httpx.Limits(
     max_connections=10,
     max_keepalive_connections=5,
-    keepalive_expiry=5,
+    keepalive_expiry=120,
 )
+DEFAULT_RETRIES = 2
+
+
+def _build_socket_options() -> list[tuple[int, int, int]]:
+    """Build TCP socket options for connection health monitoring.
+
+    Enables SO_KEEPALIVE and, where available, tunes the kernel's
+    keepalive probing so dead peers and stale NAT/firewall entries are
+    detected without waiting for the next application-level request.
+    """
+    options: list[tuple[int, int, int]] = [
+        (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
+    ]
+    # TCP keepalive tuning — constants vary by OS; only set when available.
+    if hasattr(socket, "TCP_KEEPIDLE"):
+        options.append((socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 60))
+    if hasattr(socket, "TCP_KEEPINTVL"):
+        options.append((socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 10))
+    if hasattr(socket, "TCP_KEEPCNT"):
+        options.append((socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 3))
+    return options
 
 
 class HttpTransport:
@@ -42,9 +64,10 @@ class HttpTransport:
         api_token: Optional[str] = None,
         base_url: str = DEFAULT_BASE_URL,
         api_version: str = DEFAULT_API_VERSION,
-        timeout: float = DEFAULT_TIMEOUT_SECONDS,
+        timeout: Union[float, httpx.Timeout] = DEFAULT_TIMEOUT,
         http_client: Optional[httpx.Client] = None,
         limits: Optional[httpx.Limits] = None,
+        retries: int = DEFAULT_RETRIES,
     ):
         self.api_token = api_token or os.environ.get("FR24_API_TOKEN")
         if not self.api_token:
@@ -54,14 +77,24 @@ class HttpTransport:
 
         self.base_url = base_url
         self.api_version = api_version
-        self.timeout = timeout
+        self._timeout = timeout
         self._limits = limits or DEFAULT_POOL_LIMITS
+        self._retries = retries
         self._owns_client: bool = http_client is None
 
-        self._client: httpx.Client = http_client or httpx.Client(
-            base_url=self.base_url,
-            timeout=self.timeout,
+        self._client: httpx.Client = http_client or self._build_client()
+
+    def _build_client(self) -> httpx.Client:
+        """Construct an httpx.Client with the transport's pool, retry, and socket settings."""
+        transport = httpx.HTTPTransport(
             limits=self._limits,
+            retries=self._retries,
+            socket_options=_build_socket_options(),
+        )
+        return httpx.Client(
+            transport=transport,
+            base_url=self.base_url,
+            timeout=self._timeout,
         )
 
     def _get_default_headers(self) -> dict[str, str]:
@@ -211,11 +244,7 @@ class HttpTransport:
                 "Client instead."
             )
         self.close()
-        self._client = httpx.Client(
-            base_url=self.base_url,
-            timeout=self.timeout,
-            limits=self._limits,
-        )
+        self._client = self._build_client()
         logger.debug("HTTP connection pool reset.")
 
     def __enter__(self) -> "HttpTransport":

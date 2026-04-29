@@ -173,18 +173,32 @@ client.close()
 
 ### 7. Connection Management for Long-Running Processes
 
-The SDK configures conservative connection pool limits by default (`max_connections=10`, `max_keepalive_connections=5`, `keepalive_expiry=5s`). These defaults are suitable for most workloads and help prevent resource accumulation on constrained devices.
+The SDK is hardened out of the box for long-lived use on resource-constrained
+devices.  The defaults below apply automatically when you create a `Client()`
+without a custom `http_client`:
 
-You can customize pool limits via `httpx.Limits`:
+| Setting | Default | Purpose |
+|---|---|---|
+| Pool limits | 10 max connections, 5 keepalive, 120 s expiry | Caps socket usage, prevents unbounded pool growth |
+| TCP keepalive | `SO_KEEPALIVE` + tuned `KEEPIDLE`/`INTVL`/`CNT` | Detects dead peers, prevents stale NAT/firewall entries |
+| Connect retries | 2 | Survives transient DNS and TCP connect failures |
+| Granular timeout | connect=10 s, read=30 s, write=10 s, pool=5 s | Fails fast on connect/pool stalls instead of blocking 30 s |
+
+All of these are configurable:
 
 ```python
 import httpx
 from fr24sdk.client import Client
 
-client = Client(limits=httpx.Limits(max_connections=3, max_keepalive_connections=1, keepalive_expiry=5))
+client = Client(
+    limits=httpx.Limits(max_connections=3, max_keepalive_connections=1),
+    timeout=httpx.Timeout(connect=5, read=60, write=10, pool=3),
+    retries=3,
+)
 ```
 
-For long-running processes (e.g., continuous monitoring scripts), you can periodically recycle the connection pool without recreating the client:
+For long-running processes (e.g., continuous monitoring scripts), you can
+periodically recycle the connection pool without recreating the client:
 
 ```python
 from datetime import datetime, timedelta, timezone
@@ -203,7 +217,10 @@ while True:
         client.reset()  # Recycle the connection pool
 ```
 
-> **Note:** `reset()` is not thread-safe and must not be called while requests are in-flight. It is not supported when a custom `http_client` was provided to the constructor.
+> **Note:** `reset()` is not thread-safe and must not be called while requests
+> are in-flight.  It is not supported when a custom `http_client` was provided
+> to the constructor.  Avoid calling it too frequently — each reset closes all
+> pooled connections, which temporarily increases reconnect and TIME_WAIT churn.
 
 ## Contributing
 

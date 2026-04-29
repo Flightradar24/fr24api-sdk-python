@@ -7,7 +7,7 @@ import pytest
 import httpx
 
 from fr24sdk.client import Client
-from fr24sdk.transport import DEFAULT_POOL_LIMITS
+from fr24sdk.transport import DEFAULT_POOL_LIMITS, DEFAULT_RETRIES, DEFAULT_TIMEOUT
 
 
 TEST_TOKEN = "test_api_token_123"
@@ -54,4 +54,46 @@ def test_client_reset_raises_for_user_provided_http_client():
     with pytest.raises(RuntimeError, match="user-supplied http_client"):
         client.reset()
     assert not user_client.is_closed
+    client.close()
+
+
+def test_client_default_retries_passthrough():
+    """Client applies default connection-establishment retries."""
+    client = Client(api_token=TEST_TOKEN)
+    assert client.transport._client._transport._pool._retries == DEFAULT_RETRIES
+    client.close()
+
+
+def test_client_custom_retries_passthrough():
+    """Client forwards custom retries to the transport."""
+    client = Client(api_token=TEST_TOKEN, retries=5)
+    assert client.transport._client._transport._pool._retries == 5
+    client.close()
+
+
+def test_client_default_granular_timeout():
+    """Client applies the SDK's granular timeout defaults."""
+    client = Client(api_token=TEST_TOKEN)
+    t = client.transport._client.timeout
+    assert t == DEFAULT_TIMEOUT
+    client.close()
+
+
+def test_client_float_timeout_passthrough():
+    """Client accepts a plain float timeout for backwards compat."""
+    client = Client(api_token=TEST_TOKEN, timeout=42.0)
+    t = client.transport._client.timeout
+    assert t.connect == 42.0
+    assert t.read == 42.0
+    client.close()
+
+
+def test_client_httpx_timeout_passthrough():
+    """Client accepts an httpx.Timeout object."""
+    custom = httpx.Timeout(connect=1, read=2, write=3, pool=4)
+    client = Client(api_token=TEST_TOKEN, timeout=custom)
+    t = client.transport._client.timeout
+    assert t.connect == 1
+    assert t.read == 2
+    assert t.pool == 4
     client.close()

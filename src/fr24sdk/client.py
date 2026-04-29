@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 """Main synchronous client for interacting with the Flightradar24 API."""
 
-from typing import Optional, Any
+from typing import Optional, Any, Union
 import logging
 
 import httpx
@@ -30,9 +30,10 @@ class Client:
         api_token: Optional[str] = None,
         base_url: Optional[str] = None,
         api_version: Optional[str] = None,
-        timeout: Optional[float] = None,
+        timeout: Optional[Union[float, httpx.Timeout]] = None,
         http_client: Optional[httpx.Client] = None,
         limits: Optional[httpx.Limits] = None,
+        retries: Optional[int] = None,
     ):
         """Initializes the Flightradar24 API Client.
 
@@ -40,11 +41,19 @@ class Client:
             api_token: Your Flightradar24 API token. If None, reads from FR24_API_TOKEN env var.
             base_url: The base URL for the API. Defaults to production API.
             api_version: The API version. Defaults to 'v1'.
-            timeout: Request timeout in seconds. Defaults to 30s.
+            timeout: Request timeout in seconds (``float``) or a granular
+                ``httpx.Timeout`` instance.  Defaults to connect=10s,
+                read=30s, write=10s, pool=5s.
             http_client: An optional pre-configured httpx.Client instance.
+                When provided, ``limits``, ``retries``, and socket-level
+                hardening are bypassed — the caller owns the full
+                transport configuration.
             limits: Connection pool limits (an ``httpx.Limits`` instance).
                 Defaults to conservative limits suitable for most workloads.
                 Ignored when ``http_client`` is provided.
+            retries: Number of connection-establishment retries (covers DNS
+                and TCP connect failures).  Defaults to 2.  Ignored when
+                ``http_client`` is provided.
         """
         transport_kwargs: dict[str, Any] = {}
         if api_token is not None:
@@ -59,6 +68,8 @@ class Client:
             transport_kwargs["http_client"] = http_client
         if limits is not None:
             transport_kwargs["limits"] = limits
+        if retries is not None:
+            transport_kwargs["retries"] = retries
 
         self._transport = HttpTransport(**transport_kwargs)
 
