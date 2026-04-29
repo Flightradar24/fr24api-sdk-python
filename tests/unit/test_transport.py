@@ -15,6 +15,7 @@ from fr24sdk.transport import (
     DEFAULT_API_VERSION,
     DEFAULT_TIMEOUT_SECONDS,
     DEFAULT_USER_AGENT,
+    DEFAULT_POOL_LIMITS,
 )
 from fr24sdk.exceptions import (
     ApiError,
@@ -329,3 +330,93 @@ def test_transport_explicit_close() -> None:  # respx_router fixture removed
 
     assert route.called
     assert raw_client_passed_to_transport.is_closed
+
+
+# --- Connection pool limits tests ---
+
+
+def test_default_pool_limits_applied():
+    """When no http_client or limits are given, SDK defaults are applied."""
+    trans = HttpTransport(api_token=TEST_TOKEN)
+    pool = trans._client._transport._pool
+    assert pool._max_connections == DEFAULT_POOL_LIMITS.max_connections
+    assert pool._max_keepalive_connections == DEFAULT_POOL_LIMITS.max_keepalive_connections
+    assert pool._keepalive_expiry == DEFAULT_POOL_LIMITS.keepalive_expiry
+    trans.close()
+
+
+def test_custom_limits_applied():
+    """User-supplied limits override the defaults."""
+    custom_limits = httpx.Limits(
+        max_connections=3, max_keepalive_connections=1, keepalive_expiry=2
+    )
+    trans = HttpTransport(api_token=TEST_TOKEN, limits=custom_limits)
+    pool = trans._client._transport._pool
+    assert pool._max_connections == 3
+    assert pool._max_keepalive_connections == 1
+    assert pool._keepalive_expiry == 2
+    trans.close()
+
+
+def test_user_provided_http_client_ignores_limits():
+    """When http_client is provided, limits param is irrelevant."""
+    user_client = httpx.Client(
+        base_url="http://example.com",
+        limits=httpx.Limits(max_connections=42),
+    )
+    custom_limits = httpx.Limits(max_connections=1)
+    trans = HttpTransport(
+        api_token=TEST_TOKEN, http_client=user_client, limits=custom_limits
+    )
+    # The user's client should be used as-is
+    assert trans._client is user_client
+    assert trans._client._transport._pool._max_connections == 42
+    trans.close()
+
+
+# --- reset() tests ---
+
+
+@respx_mock
+def test_reset_creates_new_working_client():
+    """reset() closes the old client and creates a functional replacement."""
+    trans = HttpTransport(api_token=TEST_TOKEN)
+    old_client = trans._client
+
+    trans.reset()
+
+    assert old_client.is_closed
+    assert not trans._client.is_closed
+    assert trans._client is not old_client
+
+    # New client should be functional
+    route = respx_mock.get(FULL_TEST_URL).respond(200, json={"ok": True})
+    response = trans.request("GET", TEST_API_ENDPOINT_PATH)
+    assert response.status_code == 200
+    assert route.called
+    trans.close()
+
+
+def test_reset_preserves_pool_limits():
+    """reset() re-applies the same pool limits to the new client."""
+    custom_limits = httpx.Limits(
+        max_connections=7, max_keepalive_connections=2, keepalive_expiry=3
+    )
+    trans = HttpTransport(api_token=TEST_TOKEN, limits=custom_limits)
+    trans.reset()
+    pool = trans._client._transport._pool
+    assert pool._max_connections == 7
+    assert pool._max_keepalive_connections == 2
+    assert pool._keepalive_expiry == 3
+    trans.close()
+
+
+def test_reset_raises_for_user_provided_client():
+    """reset() raises RuntimeError when the transport uses an external client."""
+    user_client = httpx.Client(base_url="http://example.com")
+    trans = HttpTransport(api_token=TEST_TOKEN, http_client=user_client)
+    with pytest.raises(RuntimeError, match="user-supplied http_client"):
+        trans.reset()
+    # Original client should still be usable
+    assert not user_client.is_closed
+    trans.close()

@@ -32,6 +32,7 @@ class Client:
         api_version: Optional[str] = None,
         timeout: Optional[float] = None,
         http_client: Optional[httpx.Client] = None,
+        limits: Optional[httpx.Limits] = None,
     ):
         """Initializes the Flightradar24 API Client.
 
@@ -41,6 +42,9 @@ class Client:
             api_version: The API version. Defaults to 'v1'.
             timeout: Request timeout in seconds. Defaults to 30s.
             http_client: An optional pre-configured httpx.Client instance.
+            limits: Connection pool limits (an ``httpx.Limits`` instance).
+                Defaults to conservative limits suitable for most workloads.
+                Ignored when ``http_client`` is provided.
         """
         transport_kwargs: dict[str, Any] = {}
         if api_token is not None:
@@ -53,6 +57,8 @@ class Client:
             transport_kwargs["timeout"] = timeout
         if http_client is not None:
             transport_kwargs["http_client"] = http_client
+        if limits is not None:
+            transport_kwargs["limits"] = limits
 
         self._transport = HttpTransport(**transport_kwargs)
 
@@ -72,6 +78,23 @@ class Client:
         if self._transport:
             self._transport.close()
             logger.info("Flightradar24 Client transport closed.")
+
+    def reset(self) -> None:
+        """Recycles the underlying HTTP connection pool.
+
+        Closes idle connections and creates a fresh pool with the same
+        configuration.  Useful for long-running processes on
+        resource-constrained devices where periodic recycling prevents
+        socket accumulation.
+
+        Not thread-safe — do not call while requests are in-flight.
+
+        Raises:
+            RuntimeError: If the client was created with a
+                user-supplied ``http_client``.
+        """
+        self._transport.reset()
+        logger.info("Flightradar24 Client connection pool reset.")
 
     def __enter__(self) -> "Client":
         return self

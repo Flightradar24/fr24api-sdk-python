@@ -27,6 +27,11 @@ DEFAULT_BASE_URL = "https://fr24api.flightradar24.com"
 DEFAULT_API_VERSION = "v1"
 DEFAULT_TIMEOUT_SECONDS = 30
 DEFAULT_USER_AGENT = f"FR24 API Python SDK/{__version__}"
+DEFAULT_POOL_LIMITS = httpx.Limits(
+    max_connections=10,
+    max_keepalive_connections=5,
+    keepalive_expiry=5,
+)
 
 
 class HttpTransport:
@@ -39,6 +44,7 @@ class HttpTransport:
         api_version: str = DEFAULT_API_VERSION,
         timeout: float = DEFAULT_TIMEOUT_SECONDS,
         http_client: Optional[httpx.Client] = None,
+        limits: Optional[httpx.Limits] = None,
     ):
         self.api_token = api_token or os.environ.get("FR24_API_TOKEN")
         if not self.api_token:
@@ -49,10 +55,13 @@ class HttpTransport:
         self.base_url = base_url
         self.api_version = api_version
         self.timeout = timeout
+        self._limits = limits or DEFAULT_POOL_LIMITS
+        self._owns_client: bool = http_client is None
 
         self._client: httpx.Client = http_client or httpx.Client(
             base_url=self.base_url,
             timeout=self.timeout,
+            limits=self._limits,
         )
 
     def _get_default_headers(self) -> dict[str, str]:
@@ -181,6 +190,33 @@ class HttpTransport:
         """Closes the underlying HTTP client."""
         if hasattr(self, "_client") and self._client and not self._client.is_closed:
             self._client.close()
+
+    def reset(self) -> None:
+        """Closes the current HTTP client and creates a fresh one.
+
+        Useful for long-running processes on resource-constrained devices
+        where periodic connection pool recycling can prevent socket
+        accumulation. Not thread-safe — do not call while requests are
+        in-flight.
+
+        Raises:
+            RuntimeError: If the transport was created with a
+                user-supplied ``http_client``, since the SDK cannot
+                safely recreate an externally-configured client.
+        """
+        if not self._owns_client:
+            raise RuntimeError(
+                "Cannot reset a transport that was created with a "
+                "user-supplied http_client. Close and recreate the "
+                "Client instead."
+            )
+        self.close()
+        self._client = httpx.Client(
+            base_url=self.base_url,
+            timeout=self.timeout,
+            limits=self._limits,
+        )
+        logger.debug("HTTP connection pool reset.")
 
     def __enter__(self) -> "HttpTransport":
         return self
