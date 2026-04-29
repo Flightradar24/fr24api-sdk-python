@@ -182,7 +182,7 @@ without a custom `http_client`:
 | Pool limits | 10 max connections, 5 keepalive, 120 s expiry | Caps socket usage, prevents unbounded pool growth |
 | TCP keepalive | `SO_KEEPALIVE` + tuned `KEEPIDLE`/`INTVL`/`CNT` | Detects dead peers, prevents stale NAT/firewall entries |
 | Connect retries | 2 | Survives transient DNS and TCP connect failures |
-| Granular timeout | connect=10 s, read=30 s, write=10 s, pool=5 s | Fails fast on connect/pool stalls instead of blocking 30 s |
+| Granular timeout | connect=5 s, read=30 s, write=10 s, pool=5 s | Fails fast on connect/pool stalls instead of blocking 30 s |
 
 All of these are configurable:
 

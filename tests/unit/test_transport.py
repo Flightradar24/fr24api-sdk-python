@@ -79,7 +79,7 @@ def test_transport_initialization_defaults():
     assert trans.api_token == TEST_TOKEN
     assert trans.base_url == DEFAULT_BASE_URL
     assert trans.api_version == DEFAULT_API_VERSION
-    assert trans._timeout == DEFAULT_TIMEOUT
+    assert trans.timeout == DEFAULT_TIMEOUT
     assert isinstance(trans._client, httpx.Client)
     trans.close()
 
@@ -98,7 +98,7 @@ def test_transport_initialization_custom_values():
     assert trans.api_token == "custom_token"
     assert trans.base_url == custom_base_url
     assert trans.api_version == custom_api_version
-    assert trans._timeout == custom_timeout
+    assert trans.timeout == custom_timeout
     trans.close()
 
 
@@ -466,7 +466,7 @@ def test_granular_timeout_default():
     """Default timeout uses granular connect/read/write/pool values."""
     trans = HttpTransport(api_token=TEST_TOKEN)
     client_timeout = trans._client.timeout
-    assert client_timeout.connect == 10
+    assert client_timeout.connect == 5
     assert client_timeout.read == 30
     assert client_timeout.write == 10
     assert client_timeout.pool == 5

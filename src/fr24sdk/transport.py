@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 DEFAULT_BASE_URL = "https://fr24api.flightradar24.com"
 DEFAULT_API_VERSION = "v1"
 DEFAULT_USER_AGENT = f"FR24 API Python SDK/{__version__}"
-DEFAULT_TIMEOUT = httpx.Timeout(connect=10, read=30, write=10, pool=5)
+DEFAULT_TIMEOUT = httpx.Timeout(connect=5, read=30, write=10, pool=5)
 DEFAULT_POOL_LIMITS = httpx.Limits(
     max_connections=10,
     max_keepalive_connections=5,
@@ -83,6 +83,11 @@ class HttpTransport:
         self._owns_client: bool = http_client is None
 
         self._client: httpx.Client = http_client or self._build_client()
+
+    @property
+    def timeout(self) -> Union[float, httpx.Timeout]:
+        """The configured request timeout."""
+        return self._timeout
 
     def _build_client(self) -> httpx.Client:
         """Construct an httpx.Client with the transport's pool, retry, and socket settings."""
@@ -231,6 +236,9 @@ class HttpTransport:
         where periodic connection pool recycling can prevent socket
         accumulation. Not thread-safe — do not call while requests are
         in-flight.
+
+        May be called after :meth:`close` — the transport will be
+        reopened with the original configuration.
 
         Raises:
             RuntimeError: If the transport was created with a

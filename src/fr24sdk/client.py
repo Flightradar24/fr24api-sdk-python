@@ -42,7 +42,7 @@ class Client:
             base_url: The base URL for the API. Defaults to production API.
             api_version: The API version. Defaults to 'v1'.
             timeout: Request timeout in seconds (``float``) or a granular
-                ``httpx.Timeout`` instance.  Defaults to connect=10s,
+                ``httpx.Timeout`` instance.  Defaults to connect=5s,
                 read=30s, write=10s, pool=5s.
             http_client: An optional pre-configured httpx.Client instance.
                 When provided, ``limits``, ``retries``, and socket-level
