@@ -171,6 +171,33 @@ client = Client()
 client.close()
 ```
 
+### 7. Connection Management for Long-Running Processes
+
+The SDK configures conservative connection pool limits by default (`max_connections=10`, `max_keepalive_connections=5`, `keepalive_expiry=5s`). These defaults are suitable for most workloads and help prevent resource accumulation on constrained devices.
+
+You can customize pool limits via `httpx.Limits`:
+
+```python
+import httpx
+from fr24sdk.client import Client
+
+client = Client(limits=httpx.Limits(max_connections=3, max_keepalive_connections=1, keepalive_expiry=5))
+```
+
+For long-running processes (e.g., continuous monitoring scripts), you can periodically recycle the connection pool without recreating the client:
+
+```python
+client = Client()
+request_count = 0
+while True:
+    result = client.flight_summary.get_light(callsigns=["..."])
+    request_count += 1
+    if request_count % 1000 == 0:
+        client.reset()  # Recycle the connection pool
+```
+
+> **Note:** `reset()` is not thread-safe and must not be called while requests are in-flight. It is not supported when a custom `http_client` was provided to the constructor.
+
 ## Contributing
 
 Contributions are welcome! Please see `CONTRIBUTING.md` for guidelines.
