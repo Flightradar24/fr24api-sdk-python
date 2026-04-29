@@ -187,10 +187,17 @@ client = Client(limits=httpx.Limits(max_connections=3, max_keepalive_connections
 For long-running processes (e.g., continuous monitoring scripts), you can periodically recycle the connection pool without recreating the client:
 
 ```python
+from datetime import datetime, timedelta, timezone
+
 client = Client()
 request_count = 0
 while True:
-    result = client.flight_summary.get_light(callsigns=["..."])
+    now = datetime.now(timezone.utc)
+    result = client.flight_summary.get_light(
+        callsigns=["..."],
+        flight_datetime_from=now - timedelta(hours=1),
+        flight_datetime_to=now,
+    )
     request_count += 1
     if request_count % 1000 == 0:
         client.reset()  # Recycle the connection pool
