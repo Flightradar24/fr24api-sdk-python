@@ -3,9 +3,10 @@
 # SPDX-License-Identifier: MIT
 """Unit tests for the flight_summary module."""
 
-import pytest
 from unittest.mock import Mock, MagicMock
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+
+import pytest
 
 from fr24sdk.resources.flight_summary import FlightSummaryResource, _FlightSummaryParams
 from fr24sdk.models.flight import (
@@ -40,7 +41,9 @@ class TestFlightSummaryParams:
     def test_serialize_params(self):
         """Test parameters are correctly serialized for API requests."""
         # Test with various parameter types
-        test_datetime = datetime(2023, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+        test_datetime = datetime(
+            2023, 1, 1, 12, 0, 0, tzinfo=timezone(timedelta(hours=2))
+        )
         params = _FlightSummaryParams(
             flight_datetime_from=test_datetime,
             flight_datetime_to=test_datetime,
@@ -52,8 +55,12 @@ class TestFlightSummaryParams:
         serialized = params._to_query_dict()
 
         # Check serialization results
-        assert serialized["flight_datetime_from"] == str(test_datetime)
-        assert serialized["flight_datetime_to"] == str(test_datetime)
+        assert serialized["flight_datetime_from"] == str(
+            test_datetime.astimezone(timezone.utc).replace(tzinfo=None)
+        )
+        assert serialized["flight_datetime_to"] == str(
+            test_datetime.astimezone(timezone.utc).replace(tzinfo=None)
+        )
         assert serialized["flights"] == "BA1234,LH5678"
         assert serialized["callsigns"] == "BAW123"
         assert serialized["aircraft"] == "B738,A320"
@@ -145,8 +152,9 @@ class TestFlightSummaryResource:
         mock_transport.request.return_value = mock_response
 
         # Call with datetime parameters
-        from_dt = datetime(2023, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
-        to_dt = datetime(2023, 1, 1, 23, 59, 59, tzinfo=timezone.utc)
+        offset = timezone(timedelta(hours=2))
+        from_dt = datetime(2023, 1, 1, 0, 0, 0, tzinfo=offset)
+        to_dt = datetime(2023, 1, 1, 23, 59, 59, tzinfo=offset)
 
         result = flight_summary.get_light(
             flight_datetime_from=from_dt, flight_datetime_to=to_dt, airports=["EGLL"]
@@ -159,6 +167,8 @@ class TestFlightSummaryResource:
         args, kwargs = mock_transport.request.call_args
         assert "flight_datetime_from" in kwargs["params"]
         assert "flight_datetime_to" in kwargs["params"]
+        assert kwargs["params"]["flight_datetime_from"] == "2022-12-31 22:00:00"
+        assert kwargs["params"]["flight_datetime_to"] == "2023-01-01 21:59:59"
         assert kwargs["params"]["airports"] == "EGLL"
 
     def test_get_full_success(self, flight_summary, mock_transport):

@@ -5,7 +5,7 @@
 
 import warnings
 from typing import Optional, Any, Annotated, Union
-from datetime import datetime
+from datetime import datetime, timezone
 from pydantic import BaseModel, model_serializer, StringConstraints, Field
 
 from ..transport import HttpTransport
@@ -69,6 +69,10 @@ class _FlightSummaryParams(BaseModel):
                 continue
             if isinstance(value, list):
                 query[key] = ",".join(map(str, value))
+            elif isinstance(value, datetime):
+                if value.tzinfo is not None and value.utcoffset() is not None:
+                    value = value.astimezone(timezone.utc).replace(tzinfo=None)
+                query[key] = str(value)
             else:
                 query[key] = str(value)
         return query
